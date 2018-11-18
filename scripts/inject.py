@@ -47,6 +47,10 @@ def main(setup):
     if sys.platform == 'win32':
         setup['helper_path'] = setup['helper_path'].replace('\\', '/')
         setup['pydevd_path'] = setup['pydevd_path'].replace('\\', '/')
+        setup['detach'] = 0
+
+        if setup['script'] and setup['debug']:
+            setup['detach'] = 1
 
         python_code = '''import adsk.core;'''
         if setup['debug']:
@@ -60,14 +64,13 @@ attach_script.attach(port=%(port)s, host="%(host)s");
 sys.stdout.value = "blah";
 sys.stderr.value = "blah";
 '''
-        if setup['script'] is not None:
+        if setup['script']:
             setup['script'] = setup['script'].replace('\\', '/')
             python_code += '''
-import pydevd;
 import threading;
-pydevd.script_end_event = threading.Event();
-adsk.core.Application.get().fireCustomEvent("fusion_idea_run_script", "%(script)s");
-pydevd.script_end_event.wait();
+import json;
+adsk.core.Application.get().fireCustomEvent(
+    "fusion_idea_run_script", json.dumps({"script": "%(script)s", "detach": %(detach)d}));
 '''
     else:
         # We have to pass it a bit differently for gdb
