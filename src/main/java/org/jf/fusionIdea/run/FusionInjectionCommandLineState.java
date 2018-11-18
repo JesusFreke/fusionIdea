@@ -82,11 +82,6 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
         return new FusionInjectionCommandLineState(pythonConfiguration, fusionConfiguration, env, debug);
     }
 
-    /*@Nullable @Override
-    public ExecutionResult execute(Executor executor, PythonProcessStarter processStarter, CommandLinePatcher... patchers) throws ExecutionException {
-        return super.execute(executor, processStarter, patchers);
-    }*/
-
     @Override
     protected ProcessHandler doCreateProcess(GeneralCommandLine commandLine) throws ExecutionException {
 

@@ -66,8 +66,6 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         }
 
         // TODO: double-check that we found a process, show an error dialog?
-        log.warn("module is null: " + (getModule() == null));
-        log.warn("sdk is null: " + (PythonSdkType.findPythonSdk(getModule()) == null));
         return FusionInjectionCommandLineState.create(getProject(),
                 PythonSdkType.findPythonSdk(getModule()).getHomePath(),
                 this, pid, executor.getId() == DefaultDebugExecutor.EXECUTOR_ID, -1);
