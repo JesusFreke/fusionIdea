@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '0.3.12'
+}
+
+apply plugin: 'idea'
+
+group 'org.jf'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs "${gradle.gradleUserHomeDir}/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/unzipped.com.jetbrains.plugins/PythonCore-2018.2.182.4505.22/python-ce/lib"
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compileOnly name: 'python-ce'
+}
+
+intellij {
+    version '2018.2.5'
+    plugins 'PythonCore:2018.2.182.4505.22'
+}
+patchPluginXml {
+    changeNotes """
+      Add change notes here.<br>
+      <em>most HTML tags may be used</em>"""
+}
+
+task copyStubs(dependsOn: prepareSandbox, type: Copy) {
+    from(projectDir) {
+        include "scripts/"
+    }
+    into "${intellij.sandboxDirectory}/plugins/fusion_idea"
+}
+
+buildPlugin.dependsOn copyStubs
+runIde.dependsOn copyStubs
