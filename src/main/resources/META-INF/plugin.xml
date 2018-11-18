@@ -2,7 +2,7 @@
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Helpers for IDEA</name>
     <version>0.0.1</version>
-    <vendor email="dummy" url="dummy">dummy</vendor>
+    <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">fusionIdea</vendor>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
