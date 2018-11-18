@@ -14,8 +14,8 @@ import javax.swing.*;
 public class FusionRunConfigurationType implements ConfigurationType {
   public final FusionRunConfigurationFactory FACTORY = new FusionRunConfigurationFactory(this);
 
-  public static org.jetbrains.plugins.ipnb.run.IpnbRunConfigurationType getInstance() {
-    return ConfigurationTypeUtil.findConfigurationType(org.jetbrains.plugins.ipnb.run.IpnbRunConfigurationType.class);
+  public static FusionRunConfigurationType getInstance() {
+    return ConfigurationTypeUtil.findConfigurationType(FusionRunConfigurationType.class);
   }
 
   public String getDisplayName() {

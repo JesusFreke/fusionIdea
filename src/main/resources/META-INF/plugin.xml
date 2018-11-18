@@ -11,6 +11,7 @@
         <xdebugger.localAttachDebuggerProvider implementation="org.jf.fusionIdea.FusionLocalAttachDebuggerProvider"/>
         <configurationType implementation="org.jf.fusionIdea.run.FusionRunConfigurationType"/>
         <programRunner implementation="org.jf.fusionIdea.run.FusionDebugRunner" order="first"/>
+        <runConfigurationProducer implementation="org.jf.fusionIdea.run.FusionRunConfigurationProducer"/>
     </extensions>
 
 </idea-plugin>
