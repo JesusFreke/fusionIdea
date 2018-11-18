@@ -10,6 +10,10 @@ def process_command_line(argv):
     setup['host'] = '127.0.0.1'
     setup['debug'] = 0
 
+    # This script gets run in essentially 3 modes. Debug, Run, and attach.
+    # For attach mode, the script argument will be unset. And the debug argument
+    # differentiates between debug and run modes.
+
     i = 0
     while i < len(argv):
         if argv[i] == '--port':
@@ -54,6 +58,11 @@ def main(setup):
 
         python_code = '''import adsk.core;'''
         if setup['debug']:
+            # Fusion 360 appears to be using a copypasta stdout/stderr redirection based on this stackoverflow answer:
+            # https://stackoverflow.com/a/4307737/531021
+            # This is problematic because pydev expects there to be a flush method. pydev also adds its own
+            # replacements, which don't have the "value" attribute from the CatchOutErr class that fusion expects.
+            # So we add a noop flush method, and an empty value attribute, and everyone is happy.
             python_code += '''import sys;import time;
 sys.path.append("%(helper_path)s");
 sys.path.append("%(pydevd_path)s");
@@ -61,8 +70,8 @@ import attach_script;
 sys.stderr.flush = lambda: None;
 sys.stdout.flush = lambda: None;
 attach_script.attach(port=%(port)s, host="%(host)s");
-sys.stdout.value = "blah";
-sys.stderr.value = "blah";
+sys.stdout.value = "";
+sys.stderr.value = "";
 '''
         if setup['script']:
             setup['script'] = setup['script'].replace('\\', '/')
@@ -85,8 +94,6 @@ attach_script.attach(port=%(port)s, host=\\\"%(host)s\\\");'''
 adsk.core.Application.get().fireCustomEvent(\\\"fusion_idea_run_script\\\", \\\"%(script)s\\\");
 '''
     python_code = python_code % setup
-
-    print(python_code)
 
     python_code = python_code.replace('\r\n', '').replace('\r', '').replace('\n', '')
     add_code_to_python_process.run_python_code(
