@@ -13,6 +13,7 @@
         <programRunner implementation="org.jf.fusionIdea.run.FusionDebugRunner" order="first"/>
         <runConfigurationProducer implementation="org.jf.fusionIdea.run.FusionRunConfigurationProducer"/>
         <facetType implementation="org.jf.fusionIdea.facet.FusionFacetType"/>
+        <framework.type implementation="org.jf.fusionIdea.framework.FusionFramework"/>
     </extensions>
 
 </idea-plugin>
