@@ -12,7 +12,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.PythonModuleTypeBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.FusionIdeaIcons;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -23,6 +25,10 @@ public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfigura
 
     public FusionFacetType() {
         super(ID, STRING_ID, "Fusion 360 Plugin");
+    }
+
+    @Nullable @Override public Icon getIcon() {
+        return FusionIdeaIcons.LOGO;
     }
 
     public static FusionFacetType getInstance() {

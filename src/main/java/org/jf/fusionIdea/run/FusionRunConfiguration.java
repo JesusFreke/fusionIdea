@@ -7,7 +7,6 @@ import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ModuleRootManager;
@@ -36,8 +35,6 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     public FusionRunConfiguration(Project project, ConfigurationFactory factory) {
         super(new RunConfigurationModule(project), factory);
         getConfigurationModule().init();
-
-        final Module[] modules = ModuleManager.getInstance(project).getModules();
     }
 
     @Override public Collection<Module> getValidModules() {

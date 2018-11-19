@@ -11,9 +11,9 @@ import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.jetbrains.python.PythonModuleTypeBase;
-import icons.PythonIcons.Python;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.FusionIdeaIcons;
 import org.jf.fusionIdea.facet.FusionFacet;
 import org.jf.fusionIdea.facet.FusionFacetType;
 
@@ -61,6 +61,6 @@ public class FusionFramework extends FrameworkTypeEx {
     }
 
     @NotNull @Override public Icon getIcon() {
-        return Python.Python;
+        return FusionIdeaIcons.LOGO;
     }
 }

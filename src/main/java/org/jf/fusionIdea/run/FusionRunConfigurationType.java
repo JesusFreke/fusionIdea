@@ -6,8 +6,8 @@ import com.intellij.execution.configurations.ConfigurationTypeUtil;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.run.PythonConfigurationFactoryBase;
-import icons.PythonIcons;
 import org.jetbrains.annotations.NotNull;
+import org.jf.fusionIdea.FusionIdeaIcons;
 
 import javax.swing.*;
 
@@ -27,8 +27,7 @@ public class FusionRunConfigurationType implements ConfigurationType {
   }
 
   public Icon getIcon() {
-    // TODO: fusion 360 icon?
-    return PythonIcons.Python.Python;
+    return FusionIdeaIcons.LOGO;
   }
 
   @NotNull

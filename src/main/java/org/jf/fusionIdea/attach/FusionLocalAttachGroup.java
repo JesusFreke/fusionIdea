@@ -4,9 +4,9 @@ import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.UserDataHolder;
 import com.intellij.xdebugger.attach.XAttachProcessPresentationGroup;
-import icons.PythonIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.FusionIdeaIcons;
 
 import javax.swing.*;
 
@@ -36,7 +36,7 @@ public class FusionLocalAttachGroup implements XAttachProcessPresentationGroup {
 
     @NotNull @Override
     public Icon getItemIcon(@NotNull Project project, @NotNull ProcessInfo info, @NotNull UserDataHolder dataHolder) {
-        return PythonIcons.Python.Python;
+        return FusionIdeaIcons.LOGO;
     }
 
     @NotNull @Override
