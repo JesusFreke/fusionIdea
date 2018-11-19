@@ -15,7 +15,7 @@ public class FusionFacetConfiguration implements FacetConfiguration,
     @Override
     public FacetEditorTab[] createEditorTabs(
             FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {
-        return new FacetEditorTab[0];
+        return new FacetEditorTab[] { new FusionFacetEditorTab(editorContext) };
     }
 
     @Nullable @Override public FusionFacetConfiguration.State getState() {
@@ -27,6 +27,16 @@ public class FusionFacetConfiguration implements FacetConfiguration,
     }
 
     public static class State {
+        @Nullable
         public String fusionPath;
+    }
+
+    @Nullable
+    public String getFusionPath() {
+        return state.fusionPath;
+    }
+
+    public void setFusionPath(@Nullable String fusionPath) {
+        state.fusionPath = fusionPath;
     }
 }
