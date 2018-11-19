@@ -12,6 +12,10 @@ public class FusionFacetConfiguration implements FacetConfiguration,
         PersistentStateComponent<FusionFacetConfiguration.State> {
     private State state = new State();
 
+    public FusionFacetConfiguration(@Nullable String fusionPath) {
+        this.state.fusionPath = fusionPath;
+    }
+
     @Override
     public FacetEditorTab[] createEditorTabs(
             FacetEditorContext editorContext, FacetValidatorsManager validatorsManager) {

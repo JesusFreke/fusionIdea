@@ -29,7 +29,7 @@ public class FusionFacetEditorTab extends FacetEditorTab {
         if (facet != null) {
             configuration = facet.getConfiguration();
         } else {
-            configuration = new FusionFacetConfiguration();
+            configuration = FusionFacetType.newDefaultConfiguration();
         }
 
         reset();

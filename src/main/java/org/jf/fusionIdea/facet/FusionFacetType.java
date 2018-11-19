@@ -7,9 +7,14 @@ import com.intellij.facet.ui.DefaultFacetSettingsEditor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.PythonModuleTypeBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.File;
+import java.io.IOException;
 
 public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfiguration> {
 
@@ -24,9 +29,35 @@ public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfigura
         return findInstance(FusionFacetType.class);
     }
 
+    public static FusionFacetConfiguration newDefaultConfiguration() {
+        VirtualFile homeDir = VfsUtil.getUserHomeDir();
+
+        File startPath = new File(homeDir.getCanonicalPath(), "AppData/Local/Autodesk/webdeploy/production");
+
+        File fusionPath = null;
+
+        if (startPath.exists()) {
+            for (File subdir : startPath.listFiles(File::isDirectory)) {
+                File candidatePath = new File(subdir, "Fusion360.exe");
+                if (candidatePath.exists()) {
+                    fusionPath = candidatePath;
+                    break;
+                }
+            }
+        }
+
+        if (fusionPath != null) {
+            try {
+                return new FusionFacetConfiguration(fusionPath.getCanonicalPath());
+            } catch (IOException e) {
+            }
+            return new FusionFacetConfiguration(fusionPath.getAbsolutePath());
+        }
+        return new FusionFacetConfiguration(null);
+    }
+
     @Override public FusionFacetConfiguration createDefaultConfiguration() {
-        // TODO: automatically find the fusion 360 installation
-        return new FusionFacetConfiguration();
+        return newDefaultConfiguration();
     }
 
     @Override
