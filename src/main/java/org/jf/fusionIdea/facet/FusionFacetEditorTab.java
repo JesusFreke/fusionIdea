@@ -2,13 +2,19 @@ package org.jf.fusionIdea.facet;
 
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.facet.ui.FacetEditorTab;
+import com.intellij.openapi.fileChooser.FileChooserDescriptor;
+import com.intellij.openapi.fileChooser.FileTypeDescriptor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.VfsUtil;
+import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nls.Capitalization;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
@@ -32,6 +38,20 @@ public class FusionFacetEditorTab extends FacetEditorTab {
             configuration = FusionFacetType.newDefaultConfiguration();
         }
 
+        FileChooserDescriptor chooserDescriptor = new FileTypeDescriptor("Choose Fusion 360 executable", ".exe");
+
+        TextBrowseFolderListener listener =
+                new TextBrowseFolderListener(chooserDescriptor, editorContext.getProject()) {
+                    @Nullable @Override protected VirtualFile getInitialFile() {
+                        VirtualFile initialFile = super.getInitialFile();
+                        if (initialFile != null) {
+                            return initialFile;
+                        }
+
+                        return VfsUtil.getUserHomeDir();
+                    }
+                };
+        fusionPathCombo.addBrowseFolderListener(listener);
         reset();
     }
 
