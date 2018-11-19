@@ -7,7 +7,6 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
@@ -37,7 +36,6 @@ import java.util.stream.Collectors;
 public class FusionLocalAttachDebuggerProvider extends com.jetbrains.python.debugger.attach.PyLocalAttachDebuggerProvider {
 
     private static final int CONNECTION_TIMEOUT = 20000;
-    private static final Logger log = Logger.getInstance("FusionLocalAttachDebuggerProvider");
 
     @NotNull
     private static List<XLocalAttachDebugger> getAttachDebuggersForAllLocalSdks(@NotNull Project project) {

@@ -6,7 +6,6 @@ import com.intellij.execution.configurations.*;
 import com.intellij.execution.executors.DefaultDebugExecutor;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.runners.ExecutionEnvironment;
-import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.SettingsEditor;
@@ -32,8 +31,6 @@ import java.util.Collection;
 public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule>
         implements DebugAwareConfiguration {
 
-    private static final Logger log = Logger.getInstance("FusionRunConfiguration");
-
     private String script;
 
     public FusionRunConfiguration(Project project, ConfigurationFactory factory) {
@@ -41,9 +38,6 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         getConfigurationModule().init();
 
         final Module[] modules = ModuleManager.getInstance(project).getModules();
-        log.warn("Got " + modules + " modules");
-
-        log.warn("configuration module: " + (getConfigurationModule().getModule() == null));
     }
 
     @Override public Collection<Module> getValidModules() {
