@@ -60,6 +60,13 @@ public class FusionFacetEditorTab extends FacetEditorTab {
     }
 
     @Override public void apply() throws ConfigurationException {
+        String fusionPath = fusionPathCombo.getText();
+
+        if (!FusionFacet.checkFusionPath(fusionPath)) {
+            throw new ConfigurationException("Can't locate the Fusion APIs from the given path. Expecting the path " +
+                    "to the Fusion360.exe executable");
+        }
+
         configuration.setFusionPath(fusionPathCombo.getText());
 
         FusionFacet facet = FusionFacet.getInstance(module);

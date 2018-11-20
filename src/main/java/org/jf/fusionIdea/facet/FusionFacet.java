@@ -40,13 +40,29 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         });
     }
 
-    private void updateLibrary(ModifiableRootModel model) {
-        String fusionPath = getConfiguration().getFusionPath();
+    @Nullable
+    private static VirtualFile getFusionPathVirtualFile(String fusionPath) {
+        if (fusionPath == null) {
+            return null;
+        }
         File fusionExecutable = new File(fusionPath);
         File apiLocation = new File(fusionExecutable.getParentFile(), "Api/Python/packages/adsk/defs");
         VirtualFile apiVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(apiLocation);
 
-        if (apiVirtualFile == null || apiVirtualFile.exists()) {
+        if (apiVirtualFile == null || !apiVirtualFile.exists()) {
+            return null;
+        }
+        return apiVirtualFile;
+    }
+
+    public static boolean checkFusionPath(String fusionPath) {
+        return getFusionPathVirtualFile(fusionPath) != null;
+    }
+
+    private void updateLibrary(ModifiableRootModel model) {
+        VirtualFile apiVirtualFile = getFusionPathVirtualFile(getConfiguration().getFusionPath());
+
+        if (apiVirtualFile == null) {
             removeLibrary();
             return;
         }
