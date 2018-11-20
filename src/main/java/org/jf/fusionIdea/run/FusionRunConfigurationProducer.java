@@ -14,7 +14,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.python.PythonFileType;
 import com.jetbrains.python.psi.types.TypeEvalContext;
-import com.jetbrains.python.run.PythonRunConfigurationProducer;
 import com.jetbrains.python.run.RunnableScriptFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,6 +22,11 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
 
     public FusionRunConfigurationProducer() {
         super(FusionRunConfigurationType.getInstance());
+    }
+
+    @Override
+    public boolean shouldReplace(@NotNull ConfigurationFromContext self, @NotNull ConfigurationFromContext other) {
+        return false;
     }
 
     @Override
@@ -86,6 +90,6 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
 
     @Override
     public boolean isPreferredConfiguration(ConfigurationFromContext self, ConfigurationFromContext other) {
-        return other.isProducedBy(PythonRunConfigurationProducer.class);
+        return true;
     }
 }

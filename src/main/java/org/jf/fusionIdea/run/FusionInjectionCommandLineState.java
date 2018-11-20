@@ -50,6 +50,7 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
 
         pythonConfiguration.setScriptName(injectScriptPath);
         pythonConfiguration.setSdkHome(sdkPath);
+        pythonConfiguration.setUseModuleSdk(false);
         PythonEnvUtil.addToPythonPath(pythonConfiguration.getEnvs(),
                 new File(getHelpersRoot(), "pydev/pydevd_attach_to_process").getAbsolutePath());
 

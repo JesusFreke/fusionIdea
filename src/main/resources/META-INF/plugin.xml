@@ -14,6 +14,9 @@
         <runConfigurationProducer implementation="org.jf.fusionIdea.run.FusionRunConfigurationProducer"/>
         <facetType implementation="org.jf.fusionIdea.facet.FusionFacetType"/>
         <framework.type implementation="org.jf.fusionIdea.framework.FusionFramework"/>
+        <executor implementation="org.jf.fusionIdea.executor.FusionRunExecutor" />
+        <executor implementation="org.jf.fusionIdea.executor.FusionDebugExecutor" />
+        <executionTargetProvider implementation="org.jf.fusionIdea.run.FusionExecutionTargetProvider" />
     </extensions>
 
 </idea-plugin>

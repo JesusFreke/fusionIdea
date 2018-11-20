@@ -8,17 +8,23 @@ import com.jetbrains.python.debugger.PyDebugRunner;
 import com.jetbrains.python.run.CommandLinePatcher;
 import com.jetbrains.python.run.PythonCommandLineState;
 import org.jetbrains.annotations.NotNull;
+import org.jf.fusionIdea.executor.FusionDebugExecutor;
+import org.jf.fusionIdea.executor.FusionRunExecutor;
 
 public class FusionDebugRunner extends PyDebugRunner {
 
     @Override public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
-        if (!super.canRun(executorId, profile)) {
+        if (!executorId.equals(FusionRunExecutor.ID) && !executorId.equals(FusionDebugExecutor.ID)) {
             return false;
         }
         if (profile instanceof FusionRunConfiguration) {
             return true;
         }
         return false;
+    }
+
+    @NotNull @Override public String getRunnerId() {
+        return "FusionDebugRunner";
     }
 
     @Override

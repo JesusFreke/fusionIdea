@@ -1,35 +1,36 @@
 package org.jf.fusionIdea.run;
 
 import com.intellij.execution.ExecutionException;
+import com.intellij.execution.ExecutionTarget;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
-import com.intellij.execution.executors.DefaultDebugExecutor;
-import com.intellij.execution.process.ProcessInfo;
 import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
+import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
 import com.intellij.openapi.util.WriteExternalException;
 import com.intellij.openapi.util.text.StringUtil;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.xdebugger.attach.LocalAttachHost;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
-import com.jetbrains.python.run.DebugAwareConfiguration;
 import com.jetbrains.python.sdk.PythonSdkType;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.executor.FusionDebugExecutor;
 
 import java.io.File;
 import java.util.Collection;
 
 
 public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule>
-        implements DebugAwareConfiguration {
+        implements RunConfigurationWithSuppressedDefaultDebugAction, RunConfigurationWithSuppressedDefaultRunAction {
 
     private String script;
     private String sdkHome;
@@ -40,12 +41,12 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         getConfigurationModule().init();
     }
 
-    @Override public Collection<Module> getValidModules() {
-        return AbstractPythonRunConfiguration.getValidModules(this.getProject());
+    @Override public boolean canRunOn(@NotNull ExecutionTarget target) {
+        return target instanceof FusionExecutionTarget;
     }
 
-    @Override public boolean canRunUnderDebug() {
-        return true;
+    @Override public Collection<Module> getValidModules() {
+        return AbstractPythonRunConfiguration.getValidModules(this.getProject());
     }
 
     @NotNull @Override public SettingsEditor<? extends RunConfiguration> getConfigurationEditor() {
@@ -55,18 +56,24 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     @Nullable @Override
     public RunProfileState getState(@NotNull Executor executor, @NotNull ExecutionEnvironment environment)
             throws ExecutionException {
-        // TODO: check if there are multiple Fusion 360 processes, and show a chooser dialog
-        int pid = -1;
-        for (ProcessInfo processInfo : LocalAttachHost.INSTANCE.getProcessList()) {
-            if (StringUtil.containsIgnoreCase(processInfo.getExecutableName(), "Fusion360.exe")) {
-                pid = processInfo.getPid();
-            }
+
+        FusionExecutionTarget target = (FusionExecutionTarget) environment.getExecutionTarget();
+
+        VirtualFile scriptFile = LocalFileSystem.getInstance().findFileByPath(getScript());
+        if (scriptFile == null) {
+            return null;
         }
 
-        // TODO: double-check that we found a process, show an error dialog?
-        return FusionInjectionCommandLineState.create(getProject(),
-                PythonSdkType.findPythonSdk(getModule()).getHomePath(),
-                this, pid, executor.getId() == DefaultDebugExecutor.EXECUTOR_ID, -1);
+        FusionRunConfiguration configuration =
+                (FusionRunConfiguration) environment.getRunnerAndConfigurationSettings().getConfiguration();
+
+        Sdk sdk = configuration.getSdk();
+        if (sdk == null) {
+            return null;
+        }
+
+        return FusionInjectionCommandLineState.create(getProject(), sdk.getHomePath(), this, target.getPid(),
+                executor.getId().equals(FusionDebugExecutor.ID), -1);
     }
 
     public String getScript() {
@@ -88,9 +95,8 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     @Nullable public Sdk getSdk() {
         if (useModuleSdk) {
             return PythonSdkType.findPythonSdk(getModule());
-        }
-        else if (StringUtil.isEmpty(getSdkHome())) {
-            return PythonSdkType.findPythonSdk(getModule());
+        } else if (StringUtil.isEmpty(getSdkHome())) {
+            return ProjectRootManager.getInstance(getProject()).getProjectSdk();
         }
         return PythonSdkType.findSdkByPath(getSdkHome());
     }
