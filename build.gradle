@@ -34,10 +34,8 @@ patchPluginXml {
 }
 
 task copyStubs(dependsOn: prepareSandbox, type: Copy) {
-    from(projectDir) {
-        include "scripts/"
-    }
-    into "${intellij.sandboxDirectory}/plugins/fusion_idea"
+    from fileTree(projectDir).include("src/main/python/*").files
+    into "${intellij.sandboxDirectory}/plugins/fusion_idea/scripts"
 }
 
 buildPlugin.dependsOn copyStubs
