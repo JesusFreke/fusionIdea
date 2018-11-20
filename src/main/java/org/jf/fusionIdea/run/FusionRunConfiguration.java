@@ -9,6 +9,7 @@ import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.options.SettingsEditor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.util.InvalidDataException;
 import com.intellij.openapi.util.JDOMExternalizerUtil;
@@ -31,6 +32,8 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         implements DebugAwareConfiguration {
 
     private String script;
+    private String sdkHome;
+    private boolean useModuleSdk;
 
     public FusionRunConfiguration(Project project, ConfigurationFactory factory) {
         super(new RunConfigurationModule(project), factory);
@@ -74,6 +77,32 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         this.script = script;
     }
 
+    public String getSdkHome() {
+        return sdkHome;
+    }
+
+    public void setSdkHome(String sdkHome) {
+        this.sdkHome = sdkHome;
+    }
+
+    @Nullable public Sdk getSdk() {
+        if (useModuleSdk) {
+            return PythonSdkType.findPythonSdk(getModule());
+        }
+        else if (StringUtil.isEmpty(getSdkHome())) {
+            return PythonSdkType.findPythonSdk(getModule());
+        }
+        return PythonSdkType.findSdkByPath(getSdkHome());
+    }
+
+    public boolean useModuleSdk() {
+        return useModuleSdk;
+    }
+
+    public void setUseModuleSdk(boolean useModuleSdk) {
+        this.useModuleSdk = useModuleSdk;
+    }
+
     @NotNull
     public String getWorkingDirectory() {
         final String result = getProject().getBasePath();
@@ -106,10 +135,14 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     @Override public void writeExternal(@NotNull Element element) throws WriteExternalException {
         super.writeExternal(element);
         JDOMExternalizerUtil.writeField(element, "script", script);
+        JDOMExternalizerUtil.writeField(element, "sdkHome", sdkHome);
+        JDOMExternalizerUtil.writeField(element, "useModuleSdk", Boolean.toString(useModuleSdk));
     }
 
     @Override public void readExternal(@NotNull Element element) throws InvalidDataException {
         super.readExternal(element);
         script = JDOMExternalizerUtil.readField(element, "script");
+        sdkHome = JDOMExternalizerUtil.readField(element, "sdkHome");
+        useModuleSdk = Boolean.parseBoolean(JDOMExternalizerUtil.readField(element, "useModuleSdk"));
     }
 }
