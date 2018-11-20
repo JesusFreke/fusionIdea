@@ -30,7 +30,7 @@ When IDEA injects a python script into the Fusion process, it gets run as a
 separate thread. However, most things in the Fusion API can't be accessed
 off of the maid thread.
 
-In order to get around this, this add-on registers a custom event, which gets
+In order to get around this, this add-in registers a custom event, which gets
 fired by the injection script with the name of the script to run. The event handler
 runs on the main thread and runs the script similarly to how Fusion would normally
 run it.

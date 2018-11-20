@@ -120,7 +120,7 @@ except:
     pass
 
 if not helper_running:
-    sys.stderr.write("Fusion 360 must be running the helper add-on to facilitate launching scripts.")
+    sys.stderr.write("Fusion 360 must be running the helper add-in to facilitate launching scripts.")
     sys.stderr.write("See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.")
 else:
     adsk.core.Application.get().fireCustomEvent(
@@ -156,7 +156,7 @@ except:
     pass
 
 if not helper_running:
-    sys.stderr.write(\\\"Fusion 360 must be running the helper add-on to facilitate launching scripts.\\\")
+    sys.stderr.write(\\\"Fusion 360 must be running the helper add-in to facilitate launching scripts.\\\")
     sys.stderr.write(\\\"See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.\\\")
 else:
     adsk.core.Application.get().fireCustomEvent(
