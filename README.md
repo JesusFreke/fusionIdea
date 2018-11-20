@@ -1,6 +1,6 @@
 ### About
 
-This is a plugin for IntelliJ IDEA/PyCharm that facilitates developing Fusion 360 scripts, that supports launching and
+This is a plugin for IntelliJ IDEA/PyCharm that facilitates developing Fusion 360 scripts. It supports launching and
 debugging scripts in Fusion 360, directly from within IDEA.
 
 This plugin was developed on windows. I would be surprised if it worked on a mac. If someone is interested on adding
