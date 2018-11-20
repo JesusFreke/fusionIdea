@@ -24,7 +24,7 @@ public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfigura
     public static final FacetTypeId<FusionFacet> ID = new FacetTypeId<FusionFacet>(STRING_ID);
 
     public FusionFacetType() {
-        super(ID, STRING_ID, "Fusion 360 Plugin");
+        super(ID, STRING_ID, "Fusion 360 Support");
     }
 
     @Nullable @Override public Icon getIcon() {

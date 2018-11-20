@@ -6,6 +6,7 @@ import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
 import com.intellij.ide.util.frameworkSupport.FrameworkSupportModel;
+import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.roots.ModifiableModelsProvider;
@@ -51,13 +52,20 @@ public class FusionFramework extends FrameworkTypeEx {
             }
 
             @Override public boolean isEnabledForModuleType(@NotNull ModuleType moduleType) {
-                return moduleType instanceof PythonModuleTypeBase;
+                // The only purpose of this framework is to give a convenient way to add the fusion facet during
+                // module creation. If we allow it for existing modules, the user would see both the framework and
+                // facet in the "add facets" thing in the module settings.
+                return false;
+            }
+
+            @Override public boolean isEnabledForModuleBuilder(@NotNull ModuleBuilder builder) {
+                return builder.getModuleType() instanceof PythonModuleTypeBase;
             }
         };
     }
 
     @NotNull @Override public String getPresentableName() {
-        return "Fusion 360 Python Scripting";
+        return "Fusion 360 Support";
     }
 
     @NotNull @Override public Icon getIcon() {
