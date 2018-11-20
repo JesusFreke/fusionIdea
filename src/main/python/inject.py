@@ -110,8 +110,21 @@ sys.stderr.value = ""
             python_code += '''
 import adsk.core
 import json
-adsk.core.Application.get().fireCustomEvent(
-    "fusion_idea_run_script", json.dumps({"script": "%(script)s", "detach": %(detach)d}))
+import sys
+
+helper_running = False
+try:
+    import fusionIdeaHelperGlobals
+    helper_running = fusionIdeaHelperGlobals.running
+except:
+    pass
+
+if not helper_running:
+    sys.stderr.write("Fusion 360 must be running the helper add-on to facilitate launching scripts.")
+    sys.stderr.write("See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.")
+else:
+    adsk.core.Application.get().fireCustomEvent(
+        "fusion_idea_run_script", json.dumps({"script": "%(script)s", "detach": %(detach)d}))
 '''
     else:
         # We have to pass it a bit differently for gdb
@@ -133,8 +146,21 @@ sys.stderr.value = \\\"\\\"
             python_code += '''
 import adsk.core
 import json
-adsk.core.Application.get().fireCustomEvent(
-    \\\"fusion_idea_run_script\\\", json.dumps({\\\"script\\\": \\\"%(script)s\\\", \\\"detach\\\": %(detach)d}))
+import sys
+
+helper_running = False
+try:
+    import fusionIdeaHelperGlobals
+    helper_running = fusionIdeaHelperGlobals.running
+except:
+    pass
+
+if not helper_running:
+    sys.stderr.write(\\\"Fusion 360 must be running the helper add-on to facilitate launching scripts.\\\")
+    sys.stderr.write(\\\"See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.\\\")
+else:
+    adsk.core.Application.get().fireCustomEvent(
+        \\\"fusion_idea_run_script\\\", json.dumps({\\\"script\\\": \\\"%(script)s\\\", \\\"detach\\\": %(detach)d}))
 '''
 
     python_code = python_code % setup

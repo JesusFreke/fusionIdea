@@ -25,13 +25,38 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""
+When IDEA injects a python script into the Fusion process, it gets run as a
+separate thread. However, most things in the Fusion API can't be accessed
+off of the maid thread.
+
+In order to get around this, this add-on registers a custom event, which gets
+fired by the injection script with the name of the script to run. The event handler
+runs on the main thread and runs the script similarly to how Fusion would normally
+run it.
+"""
+
 import adsk.core
 import adsk.fusion
 import importlib
+import inspect
+import json
 import os
 import sys
 import traceback
-import json
+
+script_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+script_name = os.path.splitext(os.path.basename(script_path))[0]
+script_dir = os.path.dirname(script_path)
+
+
+# Import the globals module as a top-level module, so that the injection script can easily reference it
+sys.path.append(script_dir)
+try:
+    import fusionIdeaHelperGlobals
+finally:
+    del sys.path[-1]
+
 
 custom_event_name = 'fusion_idea_run_script'
 
@@ -89,6 +114,8 @@ def run(context):
 
         custom_event.add(event_handler)
         handlers.append(event_handler)
+
+        fusionIdeaHelperGlobals.running = True
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
@@ -98,6 +125,8 @@ def stop(context):
     app = adsk.core.Application.get()
     ui = app.userInterface
     try:
+        fusionIdeaHelperGlobals.running = False
+
         for handler in handlers:
             custom_event.remove(handler)
         app.unregisterCustomEvent(custom_event_name)
