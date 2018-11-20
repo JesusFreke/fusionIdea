@@ -13,10 +13,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.python.PythonFileType;
+import com.jetbrains.python.psi.PyFile;
+import com.jetbrains.python.psi.PyFromImportStatement;
+import com.jetbrains.python.psi.PyImportElement;
+import com.jetbrains.python.psi.PyRecursiveElementVisitor;
 import com.jetbrains.python.psi.types.TypeEvalContext;
 import com.jetbrains.python.run.RunnableScriptFilter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.facet.FusionFacet;
 
 public class FusionRunConfigurationProducer extends RunConfigurationProducer<FusionRunConfiguration> {
 
@@ -42,6 +47,17 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
             return false;
         }
 
+        Module module = context.getModule();
+        if (FusionFacet.getInstance(module) == null) {
+            return false;
+        }
+
+        FusionScriptDeterminator determinator = new FusionScriptDeterminator();
+        script.accept(determinator);
+        if (!determinator.looksLikeFusionScript) {
+            return false;
+        }
+
         VirtualFile vFile = script.getVirtualFile();
         if (vFile == null) {
             return false;
@@ -49,6 +65,34 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
         configuration.setScript(vFile.getPath());
         configuration.setName(configuration.suggestedName());
         return true;
+    }
+
+    private static class FusionScriptDeterminator extends PyRecursiveElementVisitor {
+        public boolean looksLikeFusionScript = false;
+
+        @Override public void visitPyFile(PyFile node) {
+            for (PyImportElement pyimport: node.getImportTargets()) {
+                if (pyimport.getImportedQName().getFirstComponent().equals("adsk")) {
+                    looksLikeFusionScript = true;
+                    break;
+                }
+            }
+            if (!looksLikeFusionScript) {
+                for (PyFromImportStatement statement : node.getFromImports()) {
+                    if (statement.getImportSourceQName().getFirstComponent().equals("adsk")) {
+                        looksLikeFusionScript = true;
+                        break;
+                    }
+                }
+            }
+            if (!looksLikeFusionScript) {
+                return;
+            }
+
+            if (node.findTopLevelFunction("run") == null) {
+                looksLikeFusionScript = false;
+            }
+        }
     }
 
     @Override
