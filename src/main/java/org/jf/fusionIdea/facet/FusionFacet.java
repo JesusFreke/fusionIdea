@@ -46,6 +46,11 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         File apiLocation = new File(fusionExecutable.getParentFile(), "Api/Python/packages/adsk/defs");
         VirtualFile apiVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(apiLocation);
 
+        if (apiVirtualFile == null || apiVirtualFile.exists()) {
+            removeLibrary();
+            return;
+        }
+
         LibraryTable libraryTable = model.getModuleLibraryTable();
         LibraryEx library = (LibraryEx) libraryTable.getLibraryByName(LIB_NAME);
         if (library != null) {
