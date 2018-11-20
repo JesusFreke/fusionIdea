@@ -1,11 +1,15 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
-    <name>Fusion 360 Helpers for IDEA</name>
-    <version>0.0.1</version>
-    <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">fusionIdea</vendor>
+    <name>Fusion 360 Scripting</name>
+    <version>0.5.0</version>
+    <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
+    <description>This plugin provides support for developing Fusion 360 python scripts. It allows you to directly
+        launch and debug scripts in Fusion 360, similarly to the bundled Spyder IDE.</description>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>com.intellij.modules.python</depends>
+
+    <change-notes>Initial release</change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
         <xdebugger.localAttachDebuggerProvider implementation="org.jf.fusionIdea.attach.FusionLocalAttachDebuggerProvider"/>
