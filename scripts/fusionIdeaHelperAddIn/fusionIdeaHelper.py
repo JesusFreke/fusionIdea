@@ -44,19 +44,16 @@ import json
 import os
 import sys
 import traceback
+import types
 
 script_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 script_name = os.path.splitext(os.path.basename(script_path))[0]
 script_dir = os.path.dirname(script_path)
 
 
-# Import the globals module as a top-level module, so that the injection script can easily reference it
-sys.path.append(script_dir)
-try:
-    import fusionIdeaHelperGlobals
-finally:
-    del sys.path[-1]
-
+# Create a new top-level module so we can share state with the inject script
+sys.modules['fusionIdeaHelperGlobals'] = types.ModuleType('fusionIdeaHelperGlobals')
+sys.modules['fusionIdeaHelperGlobals'].running = True
 
 custom_event_name = 'fusion_idea_run_script'
 
@@ -115,7 +112,7 @@ def run(context):
         custom_event.add(event_handler)
         handlers.append(event_handler)
 
-        fusionIdeaHelperGlobals.running = True
+        sys.modules['fusionIdeaHelperGlobals'].running = True
     except:
         if ui:
             ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
@@ -125,7 +122,7 @@ def stop(context):
     app = adsk.core.Application.get()
     ui = app.userInterface
     try:
-        fusionIdeaHelperGlobals.running = False
+        sys.modules['fusionIdeaHelperGlobals'].running = False
 
         for handler in handlers:
             custom_event.remove(handler)
