@@ -15,7 +15,7 @@
     <change-notes>
         <![CDATA[
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.1"><b>v0.5.1</b></a> (2018-11-25) <br/>
-        <a href="https://github.com/hsz/idea-gitignore/compare/v0.5.0...v0.5.1"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.0...v0.5.1"><small>Changelog</small></a> <br/>
         <ul>
             <li>Tweaked the plugin dependencies so the plugin is available for IDEA in addition to PyCharm.</li>
             <li>Added a default name suggestion when creating a new run configuration, based on the name of the script.</li>
