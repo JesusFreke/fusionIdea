@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Scripting</name>
-    <version>0.5.0</version>
+    <version>0.5.1</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>This plugin provides support for developing Fusion 360 python scripts. It allows you to directly
         launch and debug scripts in Fusion 360, similarly to the bundled Spyder IDE. This plugin requires an add-on
@@ -12,7 +12,15 @@
     <depends>com.intellij.modules.lang</depends>
     <depends>PythonCore</depends>
 
-    <change-notes>Initial release</change-notes>
+    <change-notes>
+        <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.1"><b>v0.5.1</b></a> (2018-11-25) <br/>
+        <a href="https://github.com/hsz/idea-gitignore/compare/v0.5.0...v0.5.1"><small>Changelog</small></a> <br/>
+        <ul>
+            <li>Tweaked the plugin dependencies so the plugin is available for IDEA in addition to PyCharm.</li>
+            <li>Added a default name suggestion when creating a new run configuration, based on the name of the script.</li>
+        </ul>]]>
+    </change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
         <xdebugger.localAttachDebuggerProvider implementation="org.jf.fusionIdea.attach.FusionLocalAttachDebuggerProvider"/>
