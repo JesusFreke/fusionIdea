@@ -180,4 +180,13 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         sdkHome = JDOMExternalizerUtil.readField(element, "sdkHome");
         useModuleSdk = Boolean.parseBoolean(JDOMExternalizerUtil.readField(element, "useModuleSdk"));
     }
+
+    @Nullable @Override public String suggestedName() {
+        if (script == null) {
+            return null;
+        } else {
+            String name = (new File(script)).getName();
+            return name.endsWith(".py") ? name.substring(0, name.length() - 3) : name;
+        }
+    }
 }
