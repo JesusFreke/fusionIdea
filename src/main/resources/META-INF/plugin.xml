@@ -10,7 +10,7 @@
     </description>
 
     <depends>com.intellij.modules.lang</depends>
-    <depends>com.intellij.modules.python</depends>
+    <depends>PythonCore</depends>
 
     <change-notes>Initial release</change-notes>
 
