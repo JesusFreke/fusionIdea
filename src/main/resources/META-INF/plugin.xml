@@ -9,6 +9,8 @@
         information.
     </description>
 
+    <idea-version since-build="182.4892"/>
+
     <depends>com.intellij.modules.lang</depends>
     <depends>PythonCore</depends>
 

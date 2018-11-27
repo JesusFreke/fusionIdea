@@ -25,6 +25,7 @@ dependencies {
 intellij {
     version '2018.2.5'
     plugins 'PythonCore:2018.2.182.4505.22'
+    updateSinceUntilBuild false
 }
 
 task copyStubs(dependsOn: prepareSandbox, type: Copy) {
