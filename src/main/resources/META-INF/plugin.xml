@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Scripting</name>
-    <version>0.5.2</version>
+    <version>0.5.3</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>
 <![CDATA[
@@ -65,10 +65,14 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.2"><b>v0.5.2</b></a> (2018-11-26) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.1...v0.5.2"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.3"><b>v0.5.3</b></a> (2018-11-27) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.2...v0.5.3"><small>Changelog</small></a> <br/>
         <ul>
-            <li>Removed the "until-build" version field, so the plugin should continue to be available for newer versions of IDEA/PyCharm.</li>
+            <li>Tweak the dependencies to work with both IDEA and PyCharm.</li>
+            <li>Add a plugin settings screen for PyCharm specifically under Settings->Languages & Frameworks, to allow
+            for enabling Fusion 360 support and configuring the plugin.</li>
+            <li>The separate add-on in Fusion 360 is no longer needed. This functionality has been bundled directly
+            into the plugin.</li>
         </ul>]]>
     </change-notes>
 
