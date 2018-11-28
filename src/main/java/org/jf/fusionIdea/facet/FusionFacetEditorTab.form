@@ -20,7 +20,7 @@
         </constraints>
         <properties>
           <horizontalAlignment value="11"/>
-          <text value="Fusion 360 Executable"/>
+          <text value="Fusion 360 Executable:"/>
           <verticalAlignment value="0"/>
           <verticalTextPosition value="0"/>
         </properties>

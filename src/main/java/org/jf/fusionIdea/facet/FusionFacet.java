@@ -33,6 +33,7 @@ import com.intellij.execution.process.ProcessInfo;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
 import com.intellij.facet.FacetType;
+import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
@@ -72,6 +73,22 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             ModifiableRootModel rootModel = editorContext.getModifiableRootModel();
             updateLibrary(rootModel);
         });
+    }
+
+    public static FusionFacet addFacet(Module module, ModifiableModelsProvider modifiableModelsProvider) {
+        ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(module);
+        FusionFacetType fusionFacetType = FusionFacetType.getInstance();
+        FusionFacet fusionFacet = FacetManager.getInstance(module).createFacet(fusionFacetType,
+                fusionFacetType.getDefaultFacetName(), null);
+        facetModel.addFacet(fusionFacet);
+        modifiableModelsProvider.commitFacetModifiableModel(module, facetModel);
+        return fusionFacet;
+    }
+
+    public void removeFacet(ModifiableModelsProvider modifiableModelsProvider) {
+        ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(getModule());
+        facetModel.removeFacet(this);
+        modifiableModelsProvider.commitFacetModifiableModel(getModule(), facetModel);
     }
 
     public static boolean hasFacet(Module module) {

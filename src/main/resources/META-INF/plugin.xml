@@ -7,6 +7,22 @@
         launch and debug scripts in Fusion 360, similarly to the bundled Spyder IDE. This plugin requires an add-on
         to be installed in Fusion 360. See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more
         information.
+        <![CDATA[
+        <br/>
+        <h2>Features:</h2>
+        <ul>
+            <li>Adds a "Fusion 360 Python Script" run configuration type</li>
+            <li>"Run in Fusion 360" action launches the selected script in Fusion 360</li>
+            <li>"Debug in Fusion 360" action launches the select script in Fusion 360, and attaches
+            the debugger, so that it stops at any breakpoints that have been set. Once stopped, you can
+            do all the usual debug thing. stepping, inspecting state, etc. It also redirects any stdout and
+            stdin from your script to the status window.</li>
+            <li>Adds "Run in Fusion 360" and "Debug in Fusion 360" items to the context menu, for easy access</li>
+            <li>Supports "Attach to Process" to attach to a Fusion 360 process for debugging, without launching a script</li>
+            <li>Add fusion 360 support as a framework when creating a new module</li>
+            <li>Add fusion 360 support to an existing module via a Facet</li>
+            <li>Automatically adds the Fusion 360 APIs as a module dependency, so you get autocomplete and api documentation</li>
+        </ul>]]>
     </description>
 
     <idea-version since-build="182.4892"/>

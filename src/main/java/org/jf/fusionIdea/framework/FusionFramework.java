@@ -29,8 +29,6 @@
 
 package org.jf.fusionIdea.framework;
 
-import com.intellij.facet.FacetManager;
-import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.framework.FrameworkTypeEx;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleConfigurable;
 import com.intellij.framework.addSupport.FrameworkSupportInModuleProvider;
@@ -45,7 +43,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.FusionIdeaIcons;
 import org.jf.fusionIdea.facet.FusionFacet;
-import org.jf.fusionIdea.facet.FusionFacetType;
 
 import javax.swing.*;
 
@@ -70,12 +67,7 @@ public class FusionFramework extends FrameworkTypeEx {
                     @Override
                     public void addSupport(@NotNull Module module, @NotNull ModifiableRootModel rootModel,
                                            @NotNull ModifiableModelsProvider modifiableModelsProvider) {
-                        ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(module);
-                        FusionFacetType fusionFacetType = FusionFacetType.getInstance();
-                        FusionFacet fusionFacet = FacetManager.getInstance(module).createFacet(fusionFacetType,
-                                fusionFacetType.getDefaultFacetName(), null);
-                        facetModel.addFacet(fusionFacet);
-                        modifiableModelsProvider.commitFacetModifiableModel(module, facetModel);
+                        FusionFacet.addFacet(module, modifiableModelsProvider);
                     }
                 };
             }

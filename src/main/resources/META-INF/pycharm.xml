@@ -1,2 +1,7 @@
 <idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable groupId="language"  instance="org.jf.fusionIdea.configuration.FusionConfigurable"
+                             id="org.jf.fusionIdea.configuration.FusionConfigurable" displayName="Fusion 360"
+                             nonDefaultProject="true"/>
+    </extensions>
 </idea-plugin>
