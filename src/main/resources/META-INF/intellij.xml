@@ -1,0 +1,3 @@
+<idea-plugin>
+    <depends>PythonCore</depends>
+</idea-plugin>

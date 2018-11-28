@@ -11,8 +11,8 @@
 
     <idea-version since-build="182.4892"/>
 
-    <depends>com.intellij.modules.lang</depends>
-    <depends>PythonCore</depends>
+    <depends optional="true" config-file="intellij.xml">com.intellij.modules.java</depends>
+    <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
 
     <change-notes>
         <![CDATA[
