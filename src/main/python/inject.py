@@ -76,8 +76,13 @@ def main(setup):
     import add_code_to_python_process
     show_debug_info_on_target_process = 0
 
+    script_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
+    script_name = os.path.splitext(os.path.basename(script_path))[0]
+    script_dir = os.path.dirname(script_path)
+
     setup['pydevd_path'] = os.path.dirname(os.path.dirname(inspect.getfile(add_code_to_python_process)))
     setup['helper_path'] = os.path.dirname(inspect.getfile(add_code_to_python_process))
+    setup['script_path'] = script_dir
 
     setup['detach'] = 0
     if setup['script'] and setup['debug']:
@@ -88,6 +93,7 @@ def main(setup):
         if setup['debug']:
             setup['helper_path'] = setup['helper_path'].replace('\\', '/')
             setup['pydevd_path'] = setup['pydevd_path'].replace('\\', '/')
+            setup['script_path'] = setup['script_path'].replace('\\', '/')
 
             # Fusion 360 appears to be using a copypasta stdout/stderr redirection based on this stackoverflow answer:
             # https://stackoverflow.com/a/4307737/531021
@@ -98,12 +104,16 @@ def main(setup):
 import sys
 sys.path.append("%(helper_path)s")
 sys.path.append("%(pydevd_path)s")
-import attach_script
-sys.stderr.flush = lambda: None
-sys.stdout.flush = lambda: None
-attach_script.attach(port=%(port)s, host="%(host)s")
-sys.stdout.value = ""
-sys.stderr.value = ""
+try:
+    import attach_script
+    sys.stderr.flush = lambda: None
+    sys.stdout.flush = lambda: None
+    attach_script.attach(port=%(port)s, host="%(host)s")
+    sys.stdout.value = ""
+    sys.stderr.value = ""
+finally:
+    del sys.path[-1]
+    del sys.path[-1]
 '''
         if setup['script']:
             setup['script'] = setup['script'].replace('\\', '/')
@@ -111,20 +121,13 @@ sys.stderr.value = ""
 import adsk.core
 import json
 import sys
-
-helper_running = False
+sys.path.append("%(script_path)s")
 try:
-    import fusionIdeaHelperGlobals
-    helper_running = fusionIdeaHelperGlobals.running
-except:
-    pass
-
-if not helper_running:
-    sys.stderr.write("Fusion 360 must be running the helper add-in to facilitate launching scripts.")
-    sys.stderr.write("See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.")
-else:
-    adsk.core.Application.get().fireCustomEvent(
-        "fusion_idea_run_script", json.dumps({"script": "%(script)s", "detach": %(detach)d}))
+    import fusion_idea_helper
+finally:
+    del sys.path[-1]
+adsk.core.Application.get().fireCustomEvent(
+    "fusion_idea_run_script", json.dumps({"script": "%(script)s", "detach": %(detach)d}))
 '''
     else:
         # We have to pass it a bit differently for gdb
@@ -134,12 +137,16 @@ else:
 import sys
 sys.path.append(\\\"%(helper_path)s\\\")
 sys.path.append(\\\"%(pydevd_path)s\\\")
-import attach_script
-sys.stderr.flush = lambda: None
-sys.stdout.flush = lambda: None
-attach_script.attach(port=%(port)s, host=\\\"%(host)s\\\")
-sys.stdout.value = \\\"\\\"
-sys.stderr.value = \\\"\\\"
+try:
+    import attach_script
+    sys.stderr.flush = lambda: None
+    sys.stdout.flush = lambda: None
+    attach_script.attach(port=%(port)s, host=\\\"%(host)s\\\")
+    sys.stdout.value = \\\"\\\"
+    sys.stderr.value = \\\"\\\"
+finally
+    del sys.path[-1]
+    del sys.path[-1]
 '''
         if setup['script']:
             setup['script'] = setup['script'].replace('\\', '/')
@@ -147,20 +154,13 @@ sys.stderr.value = \\\"\\\"
 import adsk.core
 import json
 import sys
-
-helper_running = False
+sys.path.append(\\\"%(script_path)s\\\")
 try:
-    import fusionIdeaHelperGlobals
-    helper_running = fusionIdeaHelperGlobals.running
-except:
-    pass
-
-if not helper_running:
-    sys.stderr.write(\\\"Fusion 360 must be running the helper add-in to facilitate launching scripts.\\\")
-    sys.stderr.write(\\\"See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more information.\\\")
-else:
-    adsk.core.Application.get().fireCustomEvent(
-        \\\"fusion_idea_run_script\\\", json.dumps({\\\"script\\\": \\\"%(script)s\\\", \\\"detach\\\": %(detach)d}))
+    import fusion_idea_helper
+finally:
+    del sys.path[-1]
+adsk.core.Application.get().fireCustomEvent(
+    \\\"fusion_idea_run_script\\\", json.dumps({\\\"script\\\": \\\"%(script)s\\\", \\\"detach\\\": %(detach)d}))
 '''
 
     python_code = python_code % setup

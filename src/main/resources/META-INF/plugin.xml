@@ -4,9 +4,7 @@
     <version>0.5.2</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>This plugin provides support for developing Fusion 360 python scripts. It allows you to directly
-        launch and debug scripts in Fusion 360, similarly to the bundled Spyder IDE. This plugin requires an add-on
-        to be installed in Fusion 360. See https://github.com/JesusFreke/fusionIdea/blob/master/README.md for more
-        information.
+        launch and debug scripts in Fusion 360, similarly to the bundled Spyder IDE.
         <![CDATA[
         <br/>
         <h2>Features:</h2>

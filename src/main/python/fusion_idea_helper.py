@@ -50,11 +50,6 @@ script_path = os.path.abspath(inspect.getfile(inspect.currentframe()))
 script_name = os.path.splitext(os.path.basename(script_path))[0]
 script_dir = os.path.dirname(script_path)
 
-
-# Create a new top-level module so we can share state with the inject script
-sys.modules['fusionIdeaHelperGlobals'] = types.ModuleType('fusionIdeaHelperGlobals')
-sys.modules['fusionIdeaHelperGlobals'].running = True
-
 custom_event_name = 'fusion_idea_run_script'
 
 app = adsk.core.Application.get()
@@ -62,7 +57,6 @@ ui = None
 handlers = []
 saved_context = None
 custom_event = None
-
 
 class ThreadEventHandler(adsk.core.CustomEventHandler):
     def __init__(self):
@@ -82,7 +76,7 @@ class ThreadEventHandler(adsk.core.CustomEventHandler):
                 try:
                     module = importlib.import_module(script_name)
                     importlib.reload(module)
-                    module.run(saved_context)
+                    module.run({'isApplicationStartup': False})
                 finally:
                     del sys.path[-1]
                     if detach:
@@ -96,37 +90,21 @@ class ThreadEventHandler(adsk.core.CustomEventHandler):
             if ui:
                 ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
 
-
-def run(context):
-    global ui, app, custom_event, saved_context
-
-    saved_context = context
-
-    try:
-        app = adsk.core.Application.get()
-        ui = app.userInterface
-
-        custom_event = app.registerCustomEvent(custom_event_name)
-        event_handler = ThreadEventHandler()
-
-        custom_event.add(event_handler)
-        handlers.append(event_handler)
-
-        sys.modules['fusionIdeaHelperGlobals'].running = True
-    except:
-        if ui:
-            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
-
-
-def stop(context):
+try:
     app = adsk.core.Application.get()
     ui = app.userInterface
-    try:
-        sys.modules['fusionIdeaHelperGlobals'].running = False
 
-        for handler in handlers:
-            custom_event.remove(handler)
+    try:
         app.unregisterCustomEvent(custom_event_name)
     except:
-        if ui:
-            ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+        pass
+    custom_event = app.registerCustomEvent(custom_event_name)
+    event_handler = ThreadEventHandler()
+
+    custom_event.add(event_handler)
+    handlers.append(event_handler)
+except:
+    if ui:
+        ui.messageBox('Failed:\n{}'.format(traceback.format_exc()))
+
+

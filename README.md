@@ -7,18 +7,8 @@ This plugin was developed on windows. I would be surprised if it worked on a mac
 support for mac, I would be happy to provide pointers for what may need to be changed.
 
 ### Installation
-The plugin can be installed via the built-in plugin repository in IDEA. Additionally, a small helper add-in is required
-to facilitate launching scripts from IDEA.
-
-To install the add-on:
-- make a copy of the [fusionIdeaHelperAddIn](scripts/fusionIdeaHelperAddIn) directory somewhere locally
-- Go to File -> Scripts and Add-Ins
-- Switch to the Add-Ins tab
-- Click the little green + next to "My Add-Ins"
-- Navigate to the fusionIdeaHelperAddIn and click "Select Folder"
-- Select the fusionIdeaHelper add-in
-- Ensure the "Run on Startup" checkbox is checked
-- Click the "Run" button
+The plugin is available for installation via the built-in plugin repository in IDEA. You can
+search for the "Fusion 360 Scripting" plugin.
 
 ### Usage
 You add Fusion 360 support to a module by adding the Fusion 360 facet. See, e.g. Open Module Settings -> Facets.
