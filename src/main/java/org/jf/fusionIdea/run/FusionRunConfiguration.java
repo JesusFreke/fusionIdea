@@ -31,6 +31,7 @@ package org.jf.fusionIdea.run;
 
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.ExecutionTarget;
+import com.intellij.execution.ExecutionTargetManager;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
@@ -56,6 +57,7 @@ import org.jf.fusionIdea.executor.FusionDebugExecutor;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 
 public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule>
@@ -87,6 +89,20 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
             throws ExecutionException {
 
         FusionExecutionTarget target = (FusionExecutionTarget) environment.getExecutionTarget();
+        if (!target.isReady()) {
+            ExecutionTargetManager manager = ExecutionTargetManager.getInstance(getProject());
+            List<ExecutionTarget> targets = manager.getTargetsFor(environment.getRunnerAndConfigurationSettings());
+            if (targets.size() == 1) {
+                // If there's only a single process, we'll just automatically update and use the new target.
+                manager.update();
+                target = (FusionExecutionTarget) manager.getActiveTarget();
+            } else {
+                // If there are multiple available processes, we should let the user update the active process, so we
+                // don't run in the wrong one.
+                throw new ExecutionException(
+                        "The selected Fusion 360 Process is no longer valid. Please select a new process.");
+            }
+        }
 
         VirtualFile scriptFile = LocalFileSystem.getInstance().findFileByPath(getScript());
         if (scriptFile == null) {
