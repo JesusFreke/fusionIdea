@@ -90,10 +90,10 @@ def main(setup):
 
     if sys.platform == 'win32':
         python_code = ''
+        setup['script_path'] = setup['script_path'].replace('\\', '/')
         if setup['debug']:
             setup['helper_path'] = setup['helper_path'].replace('\\', '/')
             setup['pydevd_path'] = setup['pydevd_path'].replace('\\', '/')
-            setup['script_path'] = setup['script_path'].replace('\\', '/')
 
             # Fusion 360 appears to be using a copypasta stdout/stderr redirection based on this stackoverflow answer:
             # https://stackoverflow.com/a/4307737/531021
