@@ -44,6 +44,7 @@ import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VfsUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.xdebugger.attach.LocalAttachHost;
 import com.jetbrains.python.facet.LibraryContributingFacet;
@@ -52,6 +53,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -95,12 +97,43 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         return getInstance(module) != null;
     }
 
+    public static String autoDetectFusionPath() {
+        VirtualFile homeDir = VfsUtil.getUserHomeDir();
+        if (homeDir == null) {
+            return null;
+        }
+
+        File startPath = new File(homeDir.getCanonicalPath(), "AppData/Local/Autodesk/webdeploy/production");
+
+        if (startPath.exists()) {
+            for (File subdir : startPath.listFiles(File::isDirectory)) {
+                File candidatePath = new File(subdir, "Fusion360.exe");
+                if (candidatePath.exists()) {
+                    try {
+                        String canonicalPath = candidatePath.getCanonicalPath();
+                        if (checkFusionPath(canonicalPath)) {
+                            return canonicalPath;
+                        }
+                    } catch (IOException ex) {
+                        // ignore and continue
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     @Nullable
     private static VirtualFile getFusionPathVirtualFile(String fusionPath) {
         if (fusionPath == null) {
             return null;
         }
         File fusionExecutable = new File(fusionPath);
+        VirtualFile executableVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(fusionExecutable);
+        if (executableVirtualFile == null || ! executableVirtualFile.exists()) {
+            return null;
+        }
+
         File apiLocation = new File(fusionExecutable.getParentFile(), "Api/Python/packages/adsk/defs");
         VirtualFile apiVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(apiLocation);
 
