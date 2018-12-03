@@ -77,6 +77,9 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
         }
 
         Module module = context.getModule();
+        if (module == null) {
+            return false;
+        }
         if (FusionFacet.getInstance(module) == null) {
             return false;
         }
