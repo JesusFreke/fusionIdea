@@ -20,6 +20,9 @@ To install the add-on:
 - Ensure the "Run on Startup" checkbox is checked
 - Click the "Run" button
 
+#### Add-In
+Previous versions of the plugin required installation of a small add-in in Fusion 360. This is no longer required for current versions of the plugin.
+
 ### Usage
 You add Fusion 360 support to a module by adding the Fusion 360 facet. See, e.g. Open Module Settings -> Facets.
 Once you add the facet, take a look at its configuration options, and ensure the path to the Fusion360.exe executable
