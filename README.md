@@ -7,20 +7,9 @@ This plugin was developed on windows. I would be surprised if it worked on a mac
 support for mac, I would be happy to provide pointers for what may need to be changed.
 
 ### Installation
-The plugin can be installed via the built-in plugin repository in IDEA. Additionally, a small helper add-in is required
-to facilitate launching scripts from IDEA.
+The plugin can be installed via the built-in plugin repository in IDEA.
 
-To install the add-on:
-- make a copy of the [fusionIdeaHelperAddIn](scripts/fusionIdeaHelperAddIn) directory somewhere locally
-- Go to File -> Scripts and Add-Ins
-- Switch to the Add-Ins tab
-- Click the little green + next to "My Add-Ins"
-- Navigate to the fusionIdeaHelperAddIn and click "Select Folder"
-- Select the fusionIdeaHelper add-in
-- Ensure the "Run on Startup" checkbox is checked
-- Click the "Run" button
-
-#### Add-In
+Note:
 Previous versions of the plugin required installation of a small add-in in Fusion 360. This is no longer required for current versions of the plugin.
 
 ### Usage
