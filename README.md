@@ -10,6 +10,9 @@ support for mac, I would be happy to provide pointers for what may need to be ch
 The plugin is available for installation via the built-in plugin repository in IDEA. You can
 search for the "Fusion 360 Scripting" plugin.
 
+#### Add-In
+Previous versions of the plugin required installation of a small add-in in Fusion 360. This is no longer required for current versions of the plugin.
+
 ### Usage
 
 #### IDEA
