@@ -42,6 +42,7 @@ import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx.ModifiableModelEx;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
+import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -78,19 +79,25 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
     }
 
     public static FusionFacet addFacet(Module module, ModifiableModelsProvider modifiableModelsProvider) {
-        ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(module);
-        FusionFacetType fusionFacetType = FusionFacetType.getInstance();
-        FusionFacet fusionFacet = FacetManager.getInstance(module).createFacet(fusionFacetType,
-                fusionFacetType.getDefaultFacetName(), null);
-        facetModel.addFacet(fusionFacet);
-        modifiableModelsProvider.commitFacetModifiableModel(module, facetModel);
-        return fusionFacet;
+        return ApplicationManager.getApplication().runWriteAction(new Computable<FusionFacet>() {
+            @Override public FusionFacet compute() {
+                ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(module);
+                FusionFacetType fusionFacetType = FusionFacetType.getInstance();
+                FusionFacet fusionFacet = FacetManager.getInstance(module).createFacet(fusionFacetType,
+                        fusionFacetType.getDefaultFacetName(), null);
+                facetModel.addFacet(fusionFacet);
+                modifiableModelsProvider.commitFacetModifiableModel(module, facetModel);
+                return fusionFacet;
+            }
+        });
     }
 
     public void removeFacet(ModifiableModelsProvider modifiableModelsProvider) {
-        ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(getModule());
-        facetModel.removeFacet(this);
-        modifiableModelsProvider.commitFacetModifiableModel(getModule(), facetModel);
+        ApplicationManager.getApplication().runWriteAction(() -> {
+            ModifiableFacetModel facetModel = modifiableModelsProvider.getFacetModifiableModel(getModule());
+            facetModel.removeFacet(this);
+            modifiableModelsProvider.commitFacetModifiableModel(getModule(), facetModel);
+        });
     }
 
     public static boolean hasFacet(Module module) {
