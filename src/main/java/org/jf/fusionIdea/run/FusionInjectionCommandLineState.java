@@ -29,6 +29,7 @@
 
 package org.jf.fusionIdea.run;
 
+import com.intellij.execution.CommandLineUtil;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -41,6 +42,7 @@ import com.intellij.ide.plugins.IdeaPluginDescriptor;
 import com.intellij.ide.plugins.PluginManager;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
+import com.intellij.util.execution.ParametersListUtil;
 import com.jetbrains.python.debugger.attach.PyAttachToProcessCommandLineState;
 import com.jetbrains.python.run.PythonConfigurationType;
 import com.jetbrains.python.run.PythonRunConfiguration;
@@ -50,7 +52,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.FusionIdeaPlugin;
 
 import java.io.File;
-import java.util.StringJoiner;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.jetbrains.python.PythonHelpersLocator.getHelpersRoot;
 
@@ -83,7 +86,7 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
         PythonEnvUtil.addToPythonPath(pythonConfiguration.getEnvs(),
                 new File(getHelpersRoot(), "pydev/pydevd_attach_to_process").getAbsolutePath());
 
-        StringJoiner params = new StringJoiner(" ");
+        List<String> params = new ArrayList<>();
 
         if (fusionConfiguration != null) {
             params.add("--script");
@@ -99,7 +102,7 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
             params.add(String.valueOf(port));
         }
 
-        pythonConfiguration.setScriptParameters(params.toString());
+        pythonConfiguration.setScriptParameters(ParametersListUtil.join(params));
 
         Executor executor;
         if (debug) {
