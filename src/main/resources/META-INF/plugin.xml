@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Scripting</name>
-    <version>0.5.4</version>
+    <version>0.5.5</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>
 <![CDATA[
@@ -65,16 +65,11 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.4"><b>v0.5.4</b></a> (2018-11-27) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.3...v0.5.4"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.5"><b>v0.5.5</b></a> (2019-02-18) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.4...v0.5.5"><small>Changelog</small></a> <br/>
         <ul>
-            <li>Fix issue preventing "Run" action from working.</li>
-            <li>Improve the user experience when the selected Fusion 360 process goes away. It will automatically
-            update the selected process when possible, or at least show a popup letting the user know they need to
-            choose a new process.</li>
-            <li>Add an inspection to check for an invalid Fusion 360 path. This can happen when Fusion 360 updates
-            itself, which changes the path of the executable and api library.</li>
-            <li>Fix a rare NPE.</li>
+            <li>Fix an exception that could sometimes occur when enabling the Fusion 360 Facet.</li>
+            <li>Fix an issue when trying to run scripts with a space in their name/path.</li>
         </ul>]]>
     </change-notes>
 

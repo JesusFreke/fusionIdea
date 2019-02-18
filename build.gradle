@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'idea'
 
 group 'org.jf'
-version '0.5.4'
+version '0.5.5'
 
 sourceCompatibility = 1.8
 
