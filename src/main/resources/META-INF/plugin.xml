@@ -65,11 +65,10 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.5"><b>v0.5.5</b></a> (2019-02-18) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.4...v0.5.5"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.6"><b>v0.5.6</b></a> (2019-02-18) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.5...v0.5.6"><small>Changelog</small></a> <br/>
         <ul>
-            <li>Fix an exception that could sometimes occur when enabling the Fusion 360 Facet.</li>
-            <li>Fix an issue when trying to run scripts with a space in their name/path.</li>
+            <li>Update the plugin for IDEA/PyCharm 2019.1</li>
         </ul>]]>
     </change-notes>
 
