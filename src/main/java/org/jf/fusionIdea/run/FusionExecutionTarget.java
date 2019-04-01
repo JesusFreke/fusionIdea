@@ -31,6 +31,7 @@ package org.jf.fusionIdea.run;
 
 import com.intellij.execution.ExecutionTarget;
 import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.xdebugger.attach.LocalAttachHost;
 import org.jetbrains.annotations.NotNull;
@@ -75,5 +76,9 @@ public class FusionExecutionTarget extends ExecutionTarget {
             }
         }
         return false;
+    }
+
+    @Override public boolean canRun(@NotNull RunConfiguration configuration) {
+        return configuration.getType() == FusionRunConfigurationType.getInstance();
     }
 }

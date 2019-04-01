@@ -32,8 +32,8 @@ package org.jf.fusionIdea.run;
 import com.intellij.execution.Location;
 import com.intellij.execution.actions.ConfigurationContext;
 import com.intellij.execution.actions.ConfigurationFromContext;
-import com.intellij.execution.actions.RunConfigurationProducer;
-import com.intellij.openapi.extensions.Extensions;
+import com.intellij.execution.actions.LazyRunConfigurationProducer;
+import com.intellij.execution.configurations.ConfigurationFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.util.Ref;
@@ -52,10 +52,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.facet.FusionFacet;
 
-public class FusionRunConfigurationProducer extends RunConfigurationProducer<FusionRunConfiguration> {
+public class FusionRunConfigurationProducer extends LazyRunConfigurationProducer<FusionRunConfiguration> {
 
-    public FusionRunConfigurationProducer() {
-        super(FusionRunConfigurationType.getInstance());
+    @NotNull @Override public ConfigurationFactory getConfigurationFactory() {
+        return FusionRunConfigurationType.getInstance().FACTORY;
     }
 
     @Override
@@ -154,7 +154,7 @@ public class FusionRunConfigurationProducer extends RunConfigurationProducer<Fus
         }
         final Module module = ModuleUtilCore.findModuleForPsiElement(script);
         if (module != null) {
-            for (RunnableScriptFilter f : Extensions.getExtensions(RunnableScriptFilter.EP_NAME)) {
+            for (RunnableScriptFilter f : RunnableScriptFilter.EP_NAME.getExtensionList()) {
                 // Configuration producers always called by user
                 if (f.isRunnableScript(script, module, location, TypeEvalContext.userInitiated(location.getProject(), null))) {
                     return false;

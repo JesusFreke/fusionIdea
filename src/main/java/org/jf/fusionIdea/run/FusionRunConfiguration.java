@@ -60,7 +60,7 @@ import java.util.Collection;
 import java.util.List;
 
 
-public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule>
+public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigurationModule, Void>
         implements RunConfigurationWithSuppressedDefaultDebugAction, RunConfigurationWithSuppressedDefaultRunAction {
 
     private String script;
