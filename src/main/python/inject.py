@@ -111,6 +111,8 @@ try:
     sys.stderr.flush = lambda: None
     sys.stdout.flush = lambda: None
     attach_script.attach(port=%(port)s, host="%(host)s")
+    import _pydevd_bundle.pydevd_comm
+    _pydevd_bundle.pydevd_comm.MAX_IO_MSG_SIZE = 131072
     sys.stdout.value = ""
     sys.stderr.value = ""
 finally:
@@ -144,6 +146,8 @@ try:
     sys.stderr.flush = lambda: None
     sys.stdout.flush = lambda: None
     attach_script.attach(port=%(port)s, host=\\\"%(host)s\\\")
+    import _pydevd_bundle.pydevd_comm
+    _pydevd_bundle.pydevd_comm.MAX_IO_MSG_SIZE = 131072
     sys.stdout.value = \\\"\\\"
     sys.stderr.value = \\\"\\\"
 finally
