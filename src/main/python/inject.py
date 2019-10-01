@@ -95,11 +95,6 @@ def main(setup):
             setup['helper_path'] = setup['helper_path'].replace('\\', '/')
             setup['pydevd_path'] = setup['pydevd_path'].replace('\\', '/')
 
-            # Fusion 360 appears to be using a copypasta stdout/stderr redirection based on this stackoverflow answer:
-            # https://stackoverflow.com/a/4307737/531021
-            # This is problematic because pydev expects there to be a flush method. pydev also adds its own
-            # replacements, which don't have the "value" attribute from the CatchOutErr class that fusion expects.
-            # So we add a noop flush method, and an empty value attribute, and everyone is happy.
             python_code += '''
 import os
 import sys
@@ -108,13 +103,9 @@ sys.path.append("%(pydevd_path)s")
 os.environ["PYDEVD_USE_FRAME_EVAL"] = "NO"
 try:
     import attach_script
-    sys.stderr.flush = lambda: None
-    sys.stdout.flush = lambda: None
     attach_script.attach(port=%(port)s, host="%(host)s")
     import _pydevd_bundle.pydevd_comm
     _pydevd_bundle.pydevd_comm.MAX_IO_MSG_SIZE = 131072
-    sys.stdout.value = ""
-    sys.stderr.value = ""
 finally:
     del sys.path[-1]
     del sys.path[-1]
@@ -143,13 +134,9 @@ sys.path.append(\\\"%(helper_path)s\\\")
 sys.path.append(\\\"%(pydevd_path)s\\\")
 try:
     import attach_script
-    sys.stderr.flush = lambda: None
-    sys.stdout.flush = lambda: None
     attach_script.attach(port=%(port)s, host=\\\"%(host)s\\\")
     import _pydevd_bundle.pydevd_comm
     _pydevd_bundle.pydevd_comm.MAX_IO_MSG_SIZE = 131072
-    sys.stdout.value = \\\"\\\"
-    sys.stderr.value = \\\"\\\"
 finally
     del sys.path[-1]
     del sys.path[-1]
