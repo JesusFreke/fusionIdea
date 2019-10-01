@@ -101,9 +101,11 @@ def main(setup):
             # replacements, which don't have the "value" attribute from the CatchOutErr class that fusion expects.
             # So we add a noop flush method, and an empty value attribute, and everyone is happy.
             python_code += '''
+import os
 import sys
 sys.path.append("%(helper_path)s")
 sys.path.append("%(pydevd_path)s")
+os.environ["PYDEVD_USE_FRAME_EVAL"] = "NO"
 try:
     import attach_script
     sys.stderr.flush = lambda: None
