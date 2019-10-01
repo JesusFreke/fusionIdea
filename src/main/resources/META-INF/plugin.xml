@@ -65,10 +65,12 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.6"><b>v0.5.6</b></a> (2019-02-18) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.5...v0.5.6"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.7"><b>v0.5.7</b></a> (2019-09-30) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.6...v0.5.7><small>Changelog</small></a> <br/>
         <ul>
-            <li>Update the plugin for IDEA/PyCharm 2019.1</li>
+            <li>Fix some issues with the plugin with the recent Fusion 360 update that uses Python 3.7 and VSCode</li>
+            <li>Increase the default stdout buffer size, to avoid truncating long stack traces</li>
+            <li>The plugin now requires IDEA/PyCharm 2019.2+</li>
         </ul>]]>
     </change-notes>
 
