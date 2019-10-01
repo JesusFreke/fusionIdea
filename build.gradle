@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.intellij' version '0.3.12'
+    id 'org.jetbrains.intellij' version '0.4.10'
 }
 
 apply plugin: 'idea'
@@ -10,21 +10,20 @@ version '0.5.6'
 
 sourceCompatibility = 1.8
 
+def pythonCoreVersion = "2019.2.192.6817.14"
+
 repositories {
     mavenCentral()
-    flatDir {
-        dirs "${gradle.gradleUserHomeDir}/caches/modules-2/files-2.1/com.jetbrains.intellij.idea/unzipped.com.jetbrains.plugins/PythonCore-2019.1.191.6183.53/python-ce/lib"
-    }
 }
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compileOnly name: 'python-ce'
 }
 
 intellij {
-    version '2019.1'
-    plugins 'PythonCore:2019.1.191.6183.53'
+    version '2019.2.3'
+    plugins 'PythonCore:2019.2.192.6817.14',
+        'java'
     updateSinceUntilBuild false
 }
 

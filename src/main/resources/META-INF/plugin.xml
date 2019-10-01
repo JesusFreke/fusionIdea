@@ -58,7 +58,7 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 </ul>]]>
     </description>
 
-    <idea-version since-build="191"/>
+    <idea-version since-build="192"/>
 
     <depends optional="true" config-file="intellij.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
