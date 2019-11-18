@@ -38,17 +38,27 @@ import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.options.ShowSettingsUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.projectRoots.SdkModificator;
+import com.intellij.openapi.roots.OrderRootType;
 import com.intellij.openapi.roots.ui.configuration.ProjectStructureConfigurable;
+import com.intellij.openapi.util.io.FileUtilRt;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.util.PlatformUtils;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
 import com.jetbrains.python.psi.PyFile;
+import com.jetbrains.python.sdk.PythonSdkType;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.FusionIdeaPlugin;
 import org.jf.fusionIdea.facet.FusionFacet;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +143,11 @@ public class FusionExecutableInspection extends PyInspection {
                 }
                 facet.getConfiguration().setFusionPath(newPath);
                 facet.updateLibrary();
+
+                Sdk sdk = PythonSdkType.findPythonSdk(module);
+                if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
+                    updateSdk(sdk, newPath);
+                }
             }
         }
     }
@@ -167,6 +182,11 @@ public class FusionExecutableInspection extends PyInspection {
             }
             facet.getConfiguration().setFusionPath(newPath);
             facet.updateLibrary();
+
+            Sdk sdk = PythonSdkType.findPythonSdk(module);
+            if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !sdk.getHomeDirectory().exists()) {
+                updateSdk(sdk, newPath);
+            }
         }
     }
 
@@ -201,6 +221,42 @@ public class FusionExecutableInspection extends PyInspection {
                     ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
                     configurable.select(facet, true);
                 }
+            }
+        }
+    }
+
+    private static void updateSdk(Sdk sdk, String newFusionPath) {
+        File baseFusionDirectory = new File(newFusionPath).getParentFile();
+
+        SdkModificator modificator = sdk.getSdkModificator();
+
+        modificator.setHomePath(
+                new File(baseFusionDirectory, "Python/python.exe").getAbsolutePath());
+
+        for (OrderRootType rootType : OrderRootType.getAllTypes()) {
+            replaceSdkRoots(modificator, rootType, baseFusionDirectory);
+        }
+
+        modificator.commitChanges();
+    }
+
+    private static void replaceSdkRoots(SdkModificator modificator, OrderRootType rootType, File baseFusionDirectory) {
+        for (String rootUrl : modificator.getUrls(rootType)) {
+            try {
+                File root = new File(FileUtilRt.toSystemDependentName(VirtualFileManager.extractPath(rootUrl)));
+                String subPath = FusionFacet.getFusionSubPath(root.getCanonicalPath());
+                if (subPath != null) {
+                    modificator.removeRoot(rootUrl, rootType);
+
+                    VirtualFile newPath = LocalFileSystem.getInstance().findFileByIoFile(new File(baseFusionDirectory, subPath));
+                    if (newPath != null) {
+                        modificator.addRoot(
+                                newPath,
+                                rootType);
+                    }
+                }
+            } catch (Exception ex) {
+                FusionIdeaPlugin.log.error(ex);
             }
         }
     }

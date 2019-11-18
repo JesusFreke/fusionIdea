@@ -131,6 +131,23 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
     }
 
     @Nullable
+    public static String getFusionSubPath(String path) {
+        String baseString = "\\Autodesk\\webdeploy\\production\\";
+        int index = path.lastIndexOf("\\Autodesk\\webdeploy\\production\\");
+        if (index == -1) {
+            return null;
+        }
+
+        String remainder = path.substring(index + baseString.length());
+        if (remainder.matches("^[0-9a-fA-F]{40}.*")) {
+            if (remainder.length() == 40 || remainder.charAt(40) == '\\') {
+                return remainder.substring(40);
+            }
+        }
+        return null;
+    }
+
+    @Nullable
     private static VirtualFile getFusionPathVirtualFile(String fusionPath) {
         if (fusionPath == null) {
             return null;
