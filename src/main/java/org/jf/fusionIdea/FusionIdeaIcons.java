@@ -29,10 +29,10 @@
 
 package org.jf.fusionIdea;
 
-import com.intellij.openapi.util.IconLoader;
+import com.intellij.ui.IconManager;
 
 import javax.swing.*;
 
 public class FusionIdeaIcons {
-    public static final Icon LOGO = IconLoader.getIcon("f.png");
+    public static final Icon LOGO = IconManager.getInstance().getIcon("/logo.svg", FusionIdeaIcons.class);
 }
