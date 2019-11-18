@@ -91,4 +91,9 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
                          implementationClass="org.jf.fusionIdea.inspection.FusionExecutableInspection"/>
     </extensions>
 
+    <extensions defaultExtensionNs="Pythonid">
+        <pyAddSdkProvider implementation="org.jf.fusionIdea.sdk.AddFusionSdkProvider" />
+        <pythonFlavorProvider implementation="org.jf.fusionIdea.sdk.FusionPythonSdkFlavor$Provider"/>
+    </extensions>
+
 </idea-plugin>
