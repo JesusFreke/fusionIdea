@@ -6,11 +6,11 @@ plugins {
 apply plugin: 'idea'
 
 group 'org.jf'
-version '0.5.7'
+version '0.5.8'
 
 sourceCompatibility = 1.8
 
-def pythonCoreVersion = "2019.2.192.6817.14"
+def pythonCoreVersion = "193.6494.42"
 
 repositories {
     mavenCentral()
@@ -21,8 +21,8 @@ dependencies {
 }
 
 intellij {
-    version '2019.2.3'
-    plugins 'PythonCore:2019.2.192.6817.14',
+    version '2019.3.3'
+    plugins 'PythonCore:193.6494.42',
         'java'
     updateSinceUntilBuild false
 }

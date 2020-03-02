@@ -32,6 +32,7 @@ package org.jf.fusionIdea.sdk;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.projectRoots.Sdk;
+import com.intellij.openapi.util.UserDataHolder;
 import com.jetbrains.python.sdk.add.PyAddSdkProvider;
 import com.jetbrains.python.sdk.add.PyAddSdkView;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,8 @@ public class AddFusionSdkProvider implements PyAddSdkProvider {
             @Nullable Project project,
             @Nullable Module module,
             @Nullable String newProjectPath,
-            @NotNull List<? extends Sdk> existingSdks) {
+            @NotNull List<? extends Sdk> existingSdks,
+            @NotNull UserDataHolder userDataHolder) {
         return new AddFusionSdkView(existingSdks);
     }
 }
