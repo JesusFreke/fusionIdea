@@ -29,7 +29,6 @@
 
 package org.jf.fusionIdea.run;
 
-import com.intellij.execution.CommandLineUtil;
 import com.intellij.execution.ExecutionException;
 import com.intellij.execution.Executor;
 import com.intellij.execution.configurations.GeneralCommandLine;
@@ -47,15 +46,12 @@ import com.jetbrains.python.debugger.attach.PyAttachToProcessCommandLineState;
 import com.jetbrains.python.run.PythonConfigurationType;
 import com.jetbrains.python.run.PythonRunConfiguration;
 import com.jetbrains.python.run.PythonScriptCommandLineState;
-import com.jetbrains.python.sdk.PythonEnvUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.FusionIdeaPlugin;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.jetbrains.python.PythonHelpersLocator.getHelpersRoot;
 
 public class FusionInjectionCommandLineState extends PythonScriptCommandLineState {
 
@@ -77,14 +73,15 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
                 .getInstance().getFactory().createTemplateConfiguration(project);
 
         IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FusionIdeaPlugin.ID));
-        String injectScriptPath =
-                new File(new File(plugin.getPath(), "scripts"), "inject.py").getAbsolutePath();
+        String initiateAttachScript =
+                new File(new File(plugin.getPath(), "scripts"), "initiate_attach.py").getAbsolutePath();
 
-        pythonConfiguration.setScriptName(injectScriptPath);
+        String pydevdPath =
+                new File(new File(plugin.getPath(), "scripts"), "pydevd-1.9.0").getAbsolutePath();
+
+        pythonConfiguration.setScriptName(initiateAttachScript);
         pythonConfiguration.setSdkHome(sdkPath);
         pythonConfiguration.setUseModuleSdk(false);
-        PythonEnvUtil.addToPythonPath(pythonConfiguration.getEnvs(),
-                new File(getHelpersRoot(), "pydev/pydevd_attach_to_process").getAbsolutePath());
 
         List<String> params = new ArrayList<>();
 
@@ -97,6 +94,8 @@ public class FusionInjectionCommandLineState extends PythonScriptCommandLineStat
         params.add(String.valueOf(pid));
         params.add("--debug");
         params.add(debug ? "1" : "0");
+        params.add("--pydevd_path");
+        params.add(pydevdPath);
         if (port > 0) {
             params.add("--port");
             params.add(String.valueOf(port));
