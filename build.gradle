@@ -28,7 +28,7 @@ intellij {
 }
 
 task copyStubs(dependsOn: prepareSandbox, type: Copy) {
-    from fileTree(projectDir).include("src/main/python/*").files
+    from "src/main/python"
     into "${intellij.sandboxDirectory}/plugins/fusion_idea/scripts"
 }
 
