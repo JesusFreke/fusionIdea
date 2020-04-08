@@ -29,18 +29,31 @@
 
 package org.jf.fusionIdea.run;
 
-import com.intellij.execution.configurations.GeneralCommandLine;
-import com.intellij.execution.configurations.ParamsGroup;
+import com.intellij.execution.ExecutionException;
 import com.intellij.execution.configurations.RunProfile;
-import com.intellij.openapi.project.Project;
+import com.intellij.execution.configurations.RunProfileState;
+import com.intellij.execution.configurations.RunnerSettings;
+import com.intellij.execution.runners.AsyncProgramRunner;
+import com.intellij.execution.runners.ExecutionEnvironment;
+import com.intellij.execution.ui.RunContentDescriptor;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.fileEditor.FileDocumentManager;
+import com.intellij.openapi.util.ThrowableComputable;
+import com.intellij.xdebugger.XDebugProcess;
+import com.intellij.xdebugger.XDebugProcessStarter;
+import com.intellij.xdebugger.XDebugSession;
+import com.intellij.xdebugger.XDebuggerManager;
+import com.jetbrains.python.debugger.PyDebugProcess;
 import com.jetbrains.python.debugger.PyDebugRunner;
-import com.jetbrains.python.run.CommandLinePatcher;
-import com.jetbrains.python.run.PythonCommandLineState;
+import com.jetbrains.python.debugger.PyRemoteDebugProcess;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.concurrency.Promise;
 import org.jf.fusionIdea.executor.FusionDebugExecutor;
 import org.jf.fusionIdea.executor.FusionRunExecutor;
 
-public class FusionDebugRunner extends PyDebugRunner {
+import java.net.ServerSocket;
+
+public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
 
     @Override public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
         if (!executorId.equals(FusionRunExecutor.ID) && !executorId.equals(FusionDebugExecutor.ID)) {
@@ -56,20 +69,70 @@ public class FusionDebugRunner extends PyDebugRunner {
         return "FusionDebugRunner";
     }
 
-    @Override
-    public CommandLinePatcher[] createCommandLinePatchers(
-            Project project, PythonCommandLineState state, RunProfile profile, int serverLocalPort) {
 
-        return new CommandLinePatcher[] {
-                new CommandLinePatcher() {
-                    @Override public void patchCommandLine(GeneralCommandLine generalCommandLine) {
-                        int groups = generalCommandLine.getParametersList().getParamsGroupsCount();
+    @NotNull @Override
+    protected Promise<RunContentDescriptor> execute(
+            @NotNull ExecutionEnvironment environment, @NotNull RunProfileState state) throws ExecutionException {
 
-                        ParamsGroup group = generalCommandLine.getParametersList().getParamsGroupAt(groups-1);
+        return ApplicationManager.getApplication().runReadAction(
+                (ThrowableComputable<Promise<RunContentDescriptor>, ExecutionException>)() ->
+                        createSession(state, environment).then(XDebugSession::getRunContentDescriptor));
+    }
 
-                        group.addParameters("--port", String.valueOf(serverLocalPort));
+    protected Promise<XDebugSession> createSession(@NotNull RunProfileState state,
+                                                   @NotNull final ExecutionEnvironment environment)
+            throws ExecutionException {
+        FileDocumentManager.getInstance().saveAllDocuments();
+
+        final FusionScriptState fusionScriptState = (FusionScriptState)state;
+
+        final ServerSocket serverSocket = fusionScriptState.getServerSocket();
+
+        return fusionScriptState.execute(serverSocket.getLocalPort()).then(result -> {
+            try {
+                return ApplicationManager.getApplication().runReadAction(new ThrowableComputable<XDebugSession, ExecutionException>() {
+                    @Override public XDebugSession compute() throws ExecutionException {
+                        return XDebuggerManager.getInstance(environment.getProject())
+                                .startSession(environment, new XDebugProcessStarter() {
+                                    @Override
+                                    @NotNull
+                                    public XDebugProcess start(@NotNull final XDebugSession session) {
+                                        PyDebugProcess pyDebugProcess =
+                                                new PyRemoteDebugProcess(
+                                                        session,
+                                                        serverSocket,
+                                                        result.getExecutionConsole(),
+                                                        result.getProcessHandler(), "") {
+                                            protected void printConsoleInfo() {
+                                            }
+
+                                            public int getConnectTimeout() {
+                                                return 20000;
+                                            }
+
+                                            protected void detachDebuggedProcess() {
+                                                this.handleStop();
+                                            }
+
+                                            protected String getConnectionMessage() {
+                                                return "Attaching to Fusion 360 process with PID=" + fusionScriptState.getPid();
+                                            }
+
+                                            protected String getConnectionTitle() {
+                                                return "Attaching Debugger";
+                                            }
+                                        };
+
+                                        PyDebugRunner.createConsoleCommunicationAndSetupActions(
+                                                environment.getProject(), result, pyDebugProcess, session);
+                                        return pyDebugProcess;
+                                    }
+                                });
                     }
-                }
-        };
+                });
+            } catch (ExecutionException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 }

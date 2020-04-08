@@ -109,16 +109,13 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
             return null;
         }
 
-        FusionRunConfiguration configuration =
-                (FusionRunConfiguration) environment.getRunnerAndConfigurationSettings().getConfiguration();
-
-        Sdk sdk = configuration.getSdk();
+        Sdk sdk = getSdk();
         if (sdk == null) {
             return null;
         }
 
-        return FusionInjectionCommandLineState.create(getProject(), sdk.getHomePath(), this, target.getPid(),
-                executor.getId().equals(FusionDebugExecutor.ID), -1);
+        return new FusionScriptState(
+                getProject(), this, target.getPid(), executor.getId().equals(FusionDebugExecutor.ID));
     }
 
     public String getScript() {
