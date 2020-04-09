@@ -110,6 +110,8 @@ public class FusionScriptState implements DebuggableRunProfileState {
         ConsoleViewImpl consoleView = new ConsoleViewImpl(project, false);
         FusionDebugProcessHandler processHandler = new FusionDebugProcessHandler(project);
         consoleView.attachToProcess(processHandler);
+        processHandler.notifyTextAvailable("Public key hash: " + getPublicKeyHash() + "\n",
+                ProcessOutputTypes.SYSTEM);
 
         connectToFusionAndStartScript(processHandler)
                 .addCallback(new FutureCallback<Void>() {
@@ -129,12 +131,9 @@ public class FusionScriptState implements DebuggableRunProfileState {
     private FluentFuture<Void> connectToFusionAndStartScript(ProcessHandler processHandler) {
         ListeningExecutorService executor = MoreExecutors.listeningDecorator(PooledThreadExecutor.INSTANCE);
         FluentFuture<Integer> portFuture = new SSDPServer(pid).start(executor);
-
         FluentFuture<Void> startFuture = portFuture.transform(port -> {
             assert port != null;
             sendStartScriptHttpRequest(port);
-            processHandler.notifyTextAvailable("Public key hash: " + getPublicKeyHash() + "\n",
-                    ProcessOutputTypes.SYSTEM);
             return null;
         }, executor);
 
