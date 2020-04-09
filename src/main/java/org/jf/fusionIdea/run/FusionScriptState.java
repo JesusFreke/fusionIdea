@@ -53,8 +53,8 @@ import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.concurrency.AsyncPromise;
 import org.jetbrains.concurrency.Promise;
+import org.jetbrains.concurrency.Promises;
 import org.jetbrains.ide.PooledThreadExecutor;
 import org.jf.fusionIdea.FusionIdeaPlugin;
 import rawhttp.core.RawHttp;
@@ -72,13 +72,13 @@ import java.time.Duration;
 
 public class FusionScriptState implements DebuggableRunProfileState {
     private final Project project;
-    private final FusionRunConfiguration fusionRunConfiguration;
+    @Nullable private final FusionRunConfiguration fusionRunConfiguration;
     private final int pid;
     private final boolean debug;
 
     private ServerSocket serverSocket;
 
-    public FusionScriptState(Project project, FusionRunConfiguration fusionRunConfiguration,
+    public FusionScriptState(Project project, @Nullable FusionRunConfiguration fusionRunConfiguration,
                              int pid, boolean debug) {
         this.project = project;
         this.fusionRunConfiguration = fusionRunConfiguration;
@@ -111,19 +111,19 @@ public class FusionScriptState implements DebuggableRunProfileState {
         FusionDebugProcessHandler processHandler = new FusionDebugProcessHandler(project);
         consoleView.attachToProcess(processHandler);
 
-        AsyncPromise<ExecutionResult> resultPromise = new AsyncPromise<>();
-
-        connectToFusionAndStartScript(processHandler).addCallback(new FutureCallback<Void>() {
-            @Override public void onSuccess(Void aVoid) {
-                resultPromise.setResult(new DefaultExecutionResult(consoleView, processHandler));
+        connectToFusionAndStartScript(processHandler)
+                .addCallback(new FutureCallback<Void>() {
+            @Override public void onSuccess(Void unused) {
             }
 
             @Override public void onFailure(@NotNull Throwable throwable) {
-                resultPromise.setError(throwable);
+                processHandler.notifyTextAvailable(
+                        "Encountered error while attempting to connect to Fusion.", ProcessOutputTypes.SYSTEM);
+                FusionIdeaPlugin.log.error("Encountered error while attempting to connect to Fusion", throwable);
             }
         }, command -> ApplicationManager.getApplication().invokeLater(command));
 
-        return resultPromise;
+        return Promises.resolvedPromise(new DefaultExecutionResult(consoleView, processHandler));
     }
 
     private FluentFuture<Void> connectToFusionAndStartScript(ProcessHandler processHandler) {

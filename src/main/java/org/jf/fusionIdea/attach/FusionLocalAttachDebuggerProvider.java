@@ -30,7 +30,6 @@
 package org.jf.fusionIdea.attach;
 
 import com.intellij.execution.ExecutionException;
-import com.intellij.execution.ExecutionResult;
 import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
@@ -56,11 +55,10 @@ import com.jetbrains.python.sdk.PreferredSdkComparator;
 import com.jetbrains.python.sdk.PythonSdkType;
 import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.facet.FusionFacet;
-import org.jf.fusionIdea.run.FusionInjectionCommandLineState;
+import org.jf.fusionIdea.run.FusionScriptState;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -157,86 +155,63 @@ public class FusionLocalAttachDebuggerProvider
         }
 
         @Override
-        public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo) throws ExecutionException {
-            FusionLocalAttachDebugRunner runner =
-                    new FusionLocalAttachDebugRunner(project, sdkPath, processInfo.getPid());
-            runner.launch();
+        public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo)
+                throws ExecutionException {
+            launchDebugger(project, processInfo.getPid());
         }
     }
 
-    private static class FusionLocalAttachDebugRunner extends PyDebugRunner {
+    private static void launchDebugger(Project project, int pid) throws ExecutionException {
+        FileDocumentManager.getInstance().saveAllDocuments();
 
-        private final Project project;
-        private final String sdkPath;
-        private final int pid;
 
-        public FusionLocalAttachDebugRunner(Project project, String sdkPath, int pid) {
-            this.project = project;
-            this.sdkPath = sdkPath;
-            this.pid = pid;
-        }
-
-        public XDebugSession launch() throws ExecutionException {
-            FileDocumentManager.getInstance().saveAllDocuments();
-
-            return launchRemoteDebugServer();
-        }
-
-        private XDebugSession launchRemoteDebugServer() throws ExecutionException {
-            final ServerSocket serverSocket;
+        FusionScriptState state = new FusionScriptState(project, null, pid, true);
+        state.execute(0).then(result -> {
             try {
-                //noinspection SocketOpenedButNotSafelyClosed
-                serverSocket = new ServerSocket(0);
+                //start remote debug server
+                return XDebuggerManager.getInstance(project).
+                        startSessionAndShowTab(String.valueOf(pid), null, new XDebugProcessStarter() {
+                            @NotNull
+                            public XDebugProcess start(@NotNull final XDebugSession session) throws ExecutionException {
+                                int port = state.getServerSocket().getLocalPort();
+                                PyRemoteDebugProcess pyDebugProcess =
+                                        new PyRemoteDebugProcess(
+                                                session, state.getServerSocket(), result.getExecutionConsole(),
+                                                result.getProcessHandler(), "") {
+                                            @Override
+                                            protected void printConsoleInfo() {
+                                            }
+
+                                            @Override
+                                            public int getConnectTimeout() {
+                                                return CONNECTION_TIMEOUT;
+                                            }
+
+                                            @Override
+                                            protected void detachDebuggedProcess() {
+                                                handleStop();
+                                            }
+
+                                            @Override
+                                            protected String getConnectionMessage() {
+                                                return "Attaching to a process with PID=" + pid + " and port=" + port;
+                                            }
+
+                                            @Override
+                                            protected String getConnectionTitle() {
+                                                return "Attaching Debugger";
+                                            }
+                                        };
+                                pyDebugProcess.setPositionConverter(new PyLocalPositionConverter());
+
+                                PyDebugRunner.createConsoleCommunicationAndSetupActions(project, result, pyDebugProcess, session);
+
+                                return pyDebugProcess;
+                            }
+                        });
+            } catch (ExecutionException ex) {
+                throw new RuntimeException(ex);
             }
-            catch (IOException e) {
-                throw new ExecutionException("Failed to find free socket port", e);
-            }
-
-            FusionInjectionCommandLineState state = FusionInjectionCommandLineState.create(
-                    project, sdkPath, null, pid, true, serverSocket.getLocalPort());
-
-            final ExecutionResult result = state.execute(state.getEnvironment().getExecutor(), this);
-
-            //start remote debug server
-            return XDebuggerManager.getInstance(project).
-                    startSessionAndShowTab(String.valueOf(pid), null, new XDebugProcessStarter() {
-                        @org.jetbrains.annotations.NotNull
-                        public XDebugProcess start(@NotNull final XDebugSession session) {
-                            PyRemoteDebugProcess pyDebugProcess =
-                                    new PyRemoteDebugProcess(session, serverSocket, result.getExecutionConsole(),
-                                            result.getProcessHandler(), "") {
-                                        @Override
-                                        protected void printConsoleInfo() {
-                                        }
-
-                                        @Override
-                                        public int getConnectTimeout() {
-                                            return CONNECTION_TIMEOUT;
-                                        }
-
-                                        @Override
-                                        protected void detachDebuggedProcess() {
-                                            handleStop();
-                                        }
-
-                                        @Override
-                                        protected String getConnectionMessage() {
-                                            return "Attaching to a process with PID=" + pid;
-                                        }
-
-                                        @Override
-                                        protected String getConnectionTitle() {
-                                            return "Attaching Debugger";
-                                        }
-                                    };
-                            pyDebugProcess.setPositionConverter(new PyLocalPositionConverter());
-
-
-                            createConsoleCommunicationAndSetupActions(project, result, pyDebugProcess, session);
-
-                            return pyDebugProcess;
-                        }
-                    });
-        }
+        });
     }
 }
