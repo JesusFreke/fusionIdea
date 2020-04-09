@@ -36,9 +36,7 @@ import com.intellij.execution.configurations.RunnerSettings;
 import com.intellij.execution.runners.AsyncProgramRunner;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
-import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
@@ -65,10 +63,7 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
     @NotNull @Override
     protected Promise<RunContentDescriptor> execute(
             @NotNull ExecutionEnvironment environment, @NotNull RunProfileState state) throws ExecutionException {
-
-        return ApplicationManager.getApplication().runReadAction(
-                (ThrowableComputable<Promise<RunContentDescriptor>, ExecutionException>)() ->
-                        createSession(state, environment).then(XDebugSession::getRunContentDescriptor));
+        return createSession(state, environment).then(XDebugSession::getRunContentDescriptor);
     }
 
     protected Promise<XDebugSession> createSession(@NotNull RunProfileState state,
@@ -82,19 +77,17 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
 
         return fusionScriptState.execute(serverSocket.getLocalPort()).then(result -> {
             try {
-                return ApplicationManager.getApplication().runReadAction(new ThrowableComputable<XDebugSession, ExecutionException>() {
-                    @Override public XDebugSession compute() throws ExecutionException {
-                        return XDebuggerManager.getInstance(environment.getProject())
-                                .startSession(environment, new XDebugProcessStarter() {
-                                    @Override
-                                    @NotNull
-                                    public XDebugProcess start(@NotNull final XDebugSession session) {
-                                        PyDebugProcess pyDebugProcess =
-                                                new PyRemoteDebugProcess(
-                                                        session,
-                                                        serverSocket,
-                                                        result.getExecutionConsole(),
-                                                        result.getProcessHandler(), "") {
+                return XDebuggerManager.getInstance(environment.getProject())
+                        .startSession(environment, new XDebugProcessStarter() {
+                            @Override
+                            @NotNull
+                            public XDebugProcess start(@NotNull final XDebugSession session) {
+                                PyDebugProcess pyDebugProcess =
+                                        new PyRemoteDebugProcess(
+                                                session,
+                                                serverSocket,
+                                                result.getExecutionConsole(),
+                                                result.getProcessHandler(), "") {
                                             protected void printConsoleInfo() {
                                             }
 
@@ -107,7 +100,8 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
                                             }
 
                                             protected String getConnectionMessage() {
-                                                return "Attaching to Fusion 360 process with PID=" + fusionScriptState.getPid();
+                                                return "Attaching to Fusion 360 process with PID=" +
+                                                        fusionScriptState.getPid();
                                             }
 
                                             protected String getConnectionTitle() {
@@ -115,13 +109,11 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
                                             }
                                         };
 
-                                        PyDebugRunner.createConsoleCommunicationAndSetupActions(
-                                                environment.getProject(), result, pyDebugProcess, session);
-                                        return pyDebugProcess;
-                                    }
-                                });
-                    }
-                });
+                                PyDebugRunner.createConsoleCommunicationAndSetupActions(
+                                        environment.getProject(), result, pyDebugProcess, session);
+                                return pyDebugProcess;
+                            }
+                        });
             } catch (ExecutionException ex) {
                 throw new RuntimeException(ex);
             }
