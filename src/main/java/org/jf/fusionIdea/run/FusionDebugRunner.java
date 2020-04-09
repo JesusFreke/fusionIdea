@@ -62,7 +62,6 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
         return "FusionDebugRunner";
     }
 
-
     @NotNull @Override
     protected Promise<RunContentDescriptor> execute(
             @NotNull ExecutionEnvironment environment, @NotNull RunProfileState state) throws ExecutionException {

@@ -37,12 +37,14 @@ import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx.ModifiableModelEx;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -219,6 +221,16 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         updateLibrary();
     }
 
+    public static List<ProcessInfo> getProcesses() {
+        try {
+            return ProgressManager.getInstance().runProcessWithProgressSynchronously(
+                    (ThrowableComputable<List<ProcessInfo>, com.intellij.execution.ExecutionException>)() ->
+                            LocalAttachHost.INSTANCE.getProcessList(), "Getting process list", false, null);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public List<ProcessInfo> findTargetProcesses() {
         List<ProcessInfo> targetProcesses = new ArrayList<>();
         String fusionPath = this.getConfiguration().getFusionPath();
@@ -226,12 +238,11 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             return targetProcesses;
         }
 
-        for (ProcessInfo processInfo : LocalAttachHost.INSTANCE.getProcessList()) {
+        for (ProcessInfo processInfo : getProcesses()) {
             if (StringUtil.containsIgnoreCase(processInfo.getCommandLine(), fusionPath)) {
                 targetProcesses.add(processInfo);
             }
         }
-
         return targetProcesses;
     }
 }

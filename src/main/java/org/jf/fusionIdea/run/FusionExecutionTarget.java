@@ -33,11 +33,10 @@ import com.intellij.execution.ExecutionTarget;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
-import com.intellij.xdebugger.attach.LocalAttachHost;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.FusionIdeaIcons;
-import org.jf.fusionIdea.FusionIdeaPlugin;
+import org.jf.fusionIdea.facet.FusionFacet;
 
 import javax.swing.*;
 
@@ -69,8 +68,7 @@ public class FusionExecutionTarget extends ExecutionTarget {
     }
 
     @Override public boolean isReady() {
-        FusionIdeaPlugin.log.info("isReady");
-        for (ProcessInfo processInfo : LocalAttachHost.INSTANCE.getProcessList()) {
+        for (ProcessInfo processInfo : FusionFacet.getProcesses()) {
             if (processInfo.getPid() == this.targetProcess.getPid()) {
                 return true;
             }
