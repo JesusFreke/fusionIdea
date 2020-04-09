@@ -49,20 +49,13 @@ import com.jetbrains.python.debugger.PyRemoteDebugProcess;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.concurrency.Promise;
 import org.jf.fusionIdea.executor.FusionDebugExecutor;
-import org.jf.fusionIdea.executor.FusionRunExecutor;
 
 import java.net.ServerSocket;
 
 public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
 
     @Override public boolean canRun(@NotNull String executorId, @NotNull RunProfile profile) {
-        if (!executorId.equals(FusionRunExecutor.ID) && !executorId.equals(FusionDebugExecutor.ID)) {
-            return false;
-        }
-        if (profile instanceof FusionRunConfiguration) {
-            return true;
-        }
-        return false;
+        return executorId.equals(FusionDebugExecutor.ID) && profile instanceof FusionRunConfiguration;
     }
 
     @NotNull @Override public String getRunnerId() {

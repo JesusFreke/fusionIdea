@@ -159,7 +159,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
             innerRequestBuilder.put("script", new File(fusionRunConfiguration.getScript()).getAbsolutePath());
         }
 
-        innerRequestBuilder.put("detach", debug ? "1" : "0");
+        innerRequestBuilder.put("debug", debug ? "1" : "0");
         innerRequestBuilder.put("pydevd_path", pydevdPath);
         innerRequestBuilder.put("nonce", Long.toString(getNextNonce()));
         try {
