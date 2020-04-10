@@ -223,14 +223,12 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
         public FluentFuture<Integer> start(ListeningExecutorService executor) {
             return FluentFuture.from(executor.submit(() -> {
-                InetSocketAddress localBroadcastAddress = new InetSocketAddress(
-                        InetAddress.getByName("127.255.255.255"), 1900);
-                DatagramSocket socket = new DatagramSocket(
-                        new InetSocketAddress(InetAddress.getByName("127.0.0.1"), 0));
-
-                socket.setSoTimeout(1000);
-                socket.setBroadcast(true);
-                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, localBroadcastAddress));
+                InetAddress localhost = InetAddress.getByName("127.0.0.1");
+                InetSocketAddress multicastAddress = new InetSocketAddress(
+                        InetAddress.getByName("239.172.243.75"), 1900);
+                MulticastSocket socket = new MulticastSocket(new InetSocketAddress(localhost, 0));
+                socket.setLoopbackMode(/* disabled= */ false);
+                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
 
                 RawHttp rawHttp = new RawHttp();
                 long startTime = System.nanoTime();
