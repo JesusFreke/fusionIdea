@@ -221,14 +221,52 @@ public class FusionScriptState implements DebuggableRunProfileState {
                 "ST: fusion_idea:debug\r\n" +
                 "HOST: 127.0.0.1:1900\r\n\r\n").getBytes(StandardCharsets.UTF_8);
 
-        public FluentFuture<Integer> start(ListeningExecutorService executor) {
-            return FluentFuture.from(executor.submit(() -> {
+        private MulticastSocket sendIpv4SSDPRequest() {
+            try {
                 InetAddress localhost = InetAddress.getByName("127.0.0.1");
                 InetSocketAddress multicastAddress = new InetSocketAddress(
                         InetAddress.getByName("239.172.243.75"), 1900);
                 MulticastSocket socket = new MulticastSocket(new InetSocketAddress(localhost, 0));
                 socket.setLoopbackMode(/* disabled= */ false);
                 socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
+
+                return socket;
+            } catch (IOException ex) {
+                FusionIdeaPlugin.log.debug("ipv4 ssdp failed");
+                return null;
+            }
+        }
+
+        private MulticastSocket sendIpv6SSDPRequest() {
+            try {
+                InetSocketAddress multicastAddress = new InetSocketAddress(
+                        "ff01:fb68:e6b7:45f9:4acc:2559:6c6e:c014", 1900);
+                MulticastSocket socket = new MulticastSocket(0);
+                socket.setLoopbackMode(/* disabled= */ false);
+                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
+                return socket;
+            } catch (IOException ex) {
+                FusionIdeaPlugin.log.debug("ipv6 ssdp failed");
+                return null;
+            }
+        }
+
+
+        public FluentFuture<Integer> start(ListeningExecutorService executor) {
+            return FluentFuture.from(executor.submit(() -> {
+                MulticastSocket socket;
+
+                socket = sendIpv6SSDPRequest();
+
+                if (socket == null) {
+                    socket = sendIpv4SSDPRequest();
+                }
+
+                if (socket == null) {
+                    throw new RuntimeException("Couldn't send SSDP request via ipv6 or ipv4");
+                }
+
+                socket.setSoTimeout(1000);
 
                 RawHttp rawHttp = new RawHttp();
                 long startTime = System.nanoTime();
