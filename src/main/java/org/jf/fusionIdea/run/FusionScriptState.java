@@ -122,8 +122,9 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
             @Override public void onFailure(@NotNull Throwable throwable) {
                 processHandler.notifyTextAvailable(
-                        "Encountered error while attempting to connect to Fusion.", ProcessOutputTypes.SYSTEM);
+                        "Encountered error while attempting to connect to Fusion.\n", ProcessOutputTypes.SYSTEM);
                 FusionIdeaPlugin.log.error("Encountered error while attempting to connect to Fusion", throwable);
+                processHandler.destroyProcess();
             }
         }, command -> ApplicationManager.getApplication().invokeLater(command));
 
@@ -132,20 +133,12 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
     private FluentFuture<Void> connectToFusionAndStartScript(ProcessHandler processHandler) {
         ListeningExecutorService executor = MoreExecutors.listeningDecorator(PooledThreadExecutor.INSTANCE);
-        FluentFuture<Integer> portFuture = new SSDPServer(pid).start(executor);
-        FluentFuture<Void> startFuture = portFuture.transform(port -> {
+        FluentFuture<Integer> portFuture = new SSDPServer(pid).start(executor, processHandler);
+        return portFuture.transform(port -> {
             assert port != null;
             sendStartScriptHttpRequest(port);
             return null;
         }, executor);
-
-        startFuture = startFuture.catching(Exception.class, ex -> {
-            FusionIdeaPlugin.log.error("Error occurred while starting script in Fusion 360", ex);
-            processHandler.destroyProcess();
-            return null;
-        }, executor);
-
-        return startFuture;
     }
 
     private void sendStartScriptHttpRequest(int port) {
@@ -282,8 +275,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
             }
         }
 
-
-        public FluentFuture<Integer> start(ListeningExecutorService executor) {
+        public FluentFuture<Integer> start(ListeningExecutorService executor, ProcessHandler processHandler) {
             return FluentFuture.from(executor.submit(() -> {
                 MulticastSocket socket;
 
@@ -304,7 +296,11 @@ public class FusionScriptState implements DebuggableRunProfileState {
                 DatagramPacket receivedPacket = new DatagramPacket(new byte[1024], 1024);
                 int remoteDebugPort = -1;
                 do {
-                    socket.receive(receivedPacket);
+                    try {
+                        socket.receive(receivedPacket);
+                    } catch (SocketTimeoutException ex) {
+                        break;
+                    }
 
                     String data = new String(receivedPacket.getData(), 0, receivedPacket.getLength());
                     RawHttpResponse<Void> response = rawHttp.parseResponse(data);
@@ -369,6 +365,11 @@ public class FusionScriptState implements DebuggableRunProfileState {
                 } while (Duration.ofNanos(System.nanoTime() - startTime).compareTo(Duration.ofSeconds(1)) <= 0);
 
                 if (remoteDebugPort <= 0) {
+                    processHandler.notifyTextAvailable(String.format(
+                            "Could not contact Fusion 360 process %d. Is the add-in running?\n" +
+                                    "See https://github.com/JesusFreke/fusion_idea_addin/wiki/Installing-the-add-in-" +
+                                    "in-Fusion-360 for more details.\n", targetPid),
+                            ProcessOutputTypes.SYSTEM);
                     throw new RuntimeException("Did not receive a debug port for pid " + targetPid);
                 }
 
