@@ -248,25 +248,36 @@ public class FusionScriptState implements DebuggableRunProfileState {
                 MulticastSocket socket = new MulticastSocket(0);
                 socket.setLoopbackMode(/* disabled= */ false);
 
+                boolean success = false;
                 for (NetworkInterface netint : Collections.list(nets)) {
-                    if (netint.supportsMulticast()) {
-                        boolean hasIpV6 = false;
-                        for (InetAddress address : Collections.list(netint.getInetAddresses())) {
-                            if (address instanceof Inet6Address) {
-                                hasIpV6 = true;
-                                break;
+                    try {
+                        if (netint.supportsMulticast()) {
+                            boolean hasIpV6 = false;
+                            for (InetAddress address : Collections.list(netint.getInetAddresses())) {
+                                if (address instanceof Inet6Address) {
+                                    hasIpV6 = true;
+                                    break;
+                                }
+                            }
+                            if (hasIpV6) {
+                                socket.setNetworkInterface(netint);
+                                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
+                                success = true;
                             }
                         }
-                        if (hasIpV6) {
-                            socket.setNetworkInterface(netint);
-                            socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
-                        }
+                    } catch (IOException ex) {
+                        FusionIdeaPlugin.log.debug("ipv6 multicast failed on " + netint.getName(), ex);
                     }
+                }
+
+                if (!success) {
+                    FusionIdeaPlugin.log.error("Couldn't send ipv6 ssdp packet on any interface");
+                    return null;
                 }
 
                 return socket;
             } catch (IOException ex) {
-                FusionIdeaPlugin.log.debug("ipv6 ssdp failed");
+                FusionIdeaPlugin.log.debug("ipv6 ssdp failed", ex);
                 return null;
             }
         }
