@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Scripting</name>
-    <version>0.5.5</version>
+    <version>0.6.0</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>
 <![CDATA[
@@ -10,28 +10,43 @@
 <p>This is a plugin for IntelliJ IDEA/PyCharm that facilitates developing Fusion 360 scripts. It supports launching and
 debugging scripts in Fusion 360, directly from within IDEA/PyCharm.</p>
 
-<p>This plugin was developed on windows. I would be surprised if it worked on a mac. If someone is interested on adding
-support for mac, I would be happy to provide pointers for what may need to be changed.</p>
+<br>
+
+<p>This plugin now supports both Windows and Mac.</p>
+
+<br>
+
+<hr />
+<b>New in v0.6.0 - A Fusion 360 add-in is now required (again) to run/debug scripts. See
+<a href="https://github.com/JesusFreke/fusion_idea_addin/wiki/Installing-the-add-in-in-Fusion-360">here</a> for more
+information.</b>
+<hr />
 
 <h3>Usage</h3>
+
+See <a href="https://github.com/JesusFreke/fusionIdea/wiki/Getting-started-with-PyCharm-(Windows)">here</a> for a
+step-by-step "Getting Started" guide for PyCharm.
 
 <h4>IDEA</h4>
 
 <p>You enable Fusion 360 support in IDEA by adding the Fusion 360 facet to a module.
 See, e.g. Open Module Settings -> Facets. Once you add the facet, take a look at its configuration options
-and ensure the path to the Fusion360.exe executable is set correctly.</p>
+and ensure the path to the Fusion 360 executable is set correctly.</p>
 
 <h4>PyCharm</h4>
 
 <p>You enable Fusion 360 support for a project in PyCharm in Settings->Languages &amp; Frameworks->Fusion 360.
-Enable the "Fusion 360 Support Enabled" checkbox, ensure the path to Fusion360.exe is set correctly,
+Enable the "Fusion 360 Support Enabled" checkbox, ensure the path to the Fusion 360 executable is set correctly,
 and then press "Apply".</p>
 
 <hr />
+<br>
 
 <p>Once support has been enabled, you can write a Fusion 360 script as per usual. Once you are ready to
 run it, you can create a new "Fusion 360 Python Script" run configuration, and then run or debug it
 as you would expect.</p>
+
+<br>
 
 <p>As a convenient shortcut, you can right click on the script in the project browser on the left, or
 directly in the editor pane and choose "Run in Fusion 360" or "Debug in Fusion 360" </p>
@@ -41,21 +56,28 @@ directly in the editor pane and choose "Run in Fusion 360" or "Debug in Fusion 3
 <ul>
 <li>Run script in Fusion 360
 <ul>
-<li>launches a script in Fusion 360, as if you had run it from the AddIn window</li>
+<li>Launches a script in Fusion 360, as if you had run it from the AddIn window</li>
 </ul></li>
 <li>Debug script in Fusion 360
 <ul>
-<li>launches a script in fusion 360 and attached a debugger, letting you stop at breakpoints, and all the usual
+<li>Launches a script in Fusion 360 and attached a debugger, letting you stop at breakpoints, and all the usual
 debuggery goodness.</li>
-<li>Redirects stdout and stderr to the debugging console</li>
+<li>Redirects stdout and stderr to the debugging console.</li>
 </ul></li>
 <li>Attach to Process
 <ul>
-<li>attaches to a Fusion 360 process without running a script. Any breakpoints will be hit if Fusion happens to run
-the breakpointed code. e.g. if you start the script manually in Fusion 360 itself.</li>
+<li>Attaches to a Fusion 360 process without running a script. Any breakpoints will be hit if Fusion happens to run
+the breakpointed code. e.g. If you start the script manually in Fusion 360 itself.</li>
 </ul></li>
-<li>Automatically adds a dependency for the Fusion Python APIs to the module, for autocomplete, contextual docs, etc.</li>
+<li>Fusion 360 Python SDK
+<ul>
+<li>Adds a new "Fusion 360 Python SDK" type, to simplify creation of a Python SDK pointing to copy of Python that is
+bundled with Fusion.</li>
+</ul></li>
+<li>Automatically adds a dependency for the Fusion Python APIs to the module, for autocomplete, contextual docs,
+etc.</li>
 </ul>]]>
+
     </description>
 
     <idea-version since-build="193.2252"/>
@@ -65,13 +87,20 @@ the breakpointed code. e.g. if you start the script manually in Fusion 360 itsel
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.5.7"><b>v0.5.7</b></a> (2019-09-30) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.6...v0.5.7><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.0"><b>v0.6.0</b></a> (2020-04-11) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.7...v0.6.0"><small>Changelog</small></a> <br/>
         <ul>
-            <li>Fix some issues with the plugin with the recent Fusion 360 update that uses Python 3.7 and VSCode</li>
-            <li>Increase the default stdout buffer size, to avoid truncating long stack traces</li>
-            <li>The plugin now requires IDEA/PyCharm 2019.2+</li>
+            <li>Added support for Mac</li>
+            <li>An add-in is now required (again) in Fusion 360. See
+            <a href="https://github.com/JesusFreke/fusion_idea_addin/wiki/Installing-the-add-in-in-Fusion-360">here</a>
+            for more information.</li>
+            <li>Added a new Fusion 360-specific Python SDK type to simplify setting up a Python SDK that points the
+            version of Python that is bundled with Fusion 360</li>
+            <li>Added a workaround for a buggy version of pydevd that is bundled with current versions of
+            IDEA/PyCharm</li>
+            <li>The plugin now requires IDEA/PyCharm 2019.3+</li>
         </ul>]]>
+
     </change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
