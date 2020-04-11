@@ -44,6 +44,7 @@ import com.intellij.openapi.roots.impl.libraries.LibraryEx.ModifiableModelEx;
 import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.Computable;
+import com.intellij.openapi.util.SystemInfo;
 import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
@@ -54,6 +55,7 @@ import com.jetbrains.python.facet.LibraryContributingFacet;
 import com.jetbrains.python.library.PythonLibraryType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jf.fusionIdea.FusionIdeaPlugin;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,12 +108,8 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         return getInstance(module) != null;
     }
 
-    public static String autoDetectFusionPath() {
-        VirtualFile homeDir = VfsUtil.getUserHomeDir();
-        if (homeDir == null) {
-            return null;
-        }
-
+    @Nullable
+    private static String autoDetectFusionPathWindows(VirtualFile homeDir) {
         File startPath = new File(homeDir.getCanonicalPath(), "AppData/Local/Autodesk/webdeploy/production");
 
         if (startPath.exists()) {
@@ -129,6 +127,35 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
                 }
             }
         }
+        return null;
+    }
+
+    public static String autoDetectFusionPathMac(VirtualFile homeDir) {
+        File fusionExecutable = new File(homeDir.getCanonicalPath(), "Library/Application Support/Autodesk/" +
+                "webdeploy/production/Autodesk Fusion 360.app/Contents/MacOS/Autodesk Fusion 360");
+
+        if (fusionExecutable.exists()) {
+            return fusionExecutable.getAbsolutePath();
+        } else {
+            FusionIdeaPlugin.log.warn("Couldn't find fusion executable at " + fusionExecutable.getAbsolutePath());
+        }
+        return null;
+    }
+
+    @Nullable
+    public static String autoDetectFusionPath() {
+        VirtualFile homeDir = VfsUtil.getUserHomeDir();
+        if (homeDir == null) {
+            FusionIdeaPlugin.log.warn("No home dir");
+            return null;
+        }
+
+        if (SystemInfo.isWindows) {
+            return autoDetectFusionPathWindows(homeDir);
+        } else if (SystemInfo.isMac) {
+            return autoDetectFusionPathMac(homeDir);
+        }
+
         return null;
     }
 
@@ -160,7 +187,14 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             return null;
         }
 
-        File apiLocation = new File(fusionExecutable.getParentFile(), "Api/Python/packages/adsk/defs");
+        File apiLocation;
+        if (SystemInfo.isWindows) {
+            apiLocation = new File(fusionExecutable.getParentFile(), "Api/Python/packages/adsk/defs");
+        } else if (SystemInfo.isMac) {
+            apiLocation = new File(fusionExecutable.getParentFile(), "../Api/Python/packages/adsk/defs");
+        } else {
+            return null;
+        }
         VirtualFile apiVirtualFile = LocalFileSystem.getInstance().findFileByIoFile(apiLocation);
 
         if (apiVirtualFile == null || !apiVirtualFile.exists()) {
@@ -238,8 +272,20 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             return targetProcesses;
         }
 
+        String canonicalFusionPath;
+        try {
+            canonicalFusionPath = new File(fusionPath).getCanonicalPath();
+        } catch (IOException ex) {
+            canonicalFusionPath = fusionPath;
+        }
+
         for (ProcessInfo processInfo : getProcesses()) {
-            if (StringUtil.containsIgnoreCase(processInfo.getCommandLine(), fusionPath)) {
+            if (processInfo.getExecutableCannonicalPath().isPresent() &&
+                    processInfo.getExecutableCannonicalPath().get().equals(canonicalFusionPath)) {
+                targetProcesses.add(processInfo);
+            } else if (StringUtil.containsIgnoreCase(processInfo.getCommandLine(), fusionPath)) {
+                targetProcesses.add(processInfo);
+            } else if (StringUtil.containsIgnoreCase(processInfo.getCommandLine(), canonicalFusionPath)) {
                 targetProcesses.add(processInfo);
             }
         }

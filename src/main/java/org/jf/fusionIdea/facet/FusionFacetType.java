@@ -36,8 +36,6 @@ import com.intellij.facet.ui.DefaultFacetSettingsEditor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VfsUtil;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.PythonModuleTypeBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,7 +43,6 @@ import org.jf.fusionIdea.FusionIdeaIcons;
 
 import javax.swing.*;
 import java.io.File;
-import java.io.IOException;
 
 public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfiguration> {
 
@@ -65,28 +62,14 @@ public class FusionFacetType extends FacetType<FusionFacet, FusionFacetConfigura
     }
 
     public static FusionFacetConfiguration newDefaultConfiguration() {
-        VirtualFile homeDir = VfsUtil.getUserHomeDir();
-
-        File startPath = new File(homeDir.getCanonicalPath(), "AppData/Local/Autodesk/webdeploy/production");
-
-        File fusionPath = null;
-
-        if (startPath.exists()) {
-            for (File subdir : startPath.listFiles(File::isDirectory)) {
-                File candidatePath = new File(subdir, "Fusion360.exe");
-                if (candidatePath.exists()) {
-                    fusionPath = candidatePath;
-                    break;
-                }
-            }
+        String fusionPath = FusionFacet.autoDetectFusionPath();
+        File fusionFile = null;
+        if (fusionPath != null) {
+            fusionFile = new File(fusionPath);
         }
 
-        if (fusionPath != null) {
-            try {
-                return new FusionFacetConfiguration(fusionPath.getCanonicalPath());
-            } catch (IOException e) {
-            }
-            return new FusionFacetConfiguration(fusionPath.getAbsolutePath());
+        if (fusionFile != null) {
+            return new FusionFacetConfiguration(fusionFile.getAbsolutePath());
         }
         return new FusionFacetConfiguration(null);
     }

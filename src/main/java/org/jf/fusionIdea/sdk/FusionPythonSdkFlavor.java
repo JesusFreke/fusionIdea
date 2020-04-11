@@ -30,6 +30,7 @@
 package org.jf.fusionIdea.sdk;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.util.SystemInfo;
 import com.jetbrains.python.sdk.flavors.PythonFlavorProvider;
 import com.jetbrains.python.sdk.flavors.PythonSdkFlavor;
 import org.jetbrains.annotations.NotNull;
@@ -62,7 +63,7 @@ public class FusionPythonSdkFlavor extends PythonSdkFlavor {
     }
 
     @Nullable
-    private String findFusionPythonSdkPath() {
+    private String findFusionPythonSdkPathWindows() {
         String fusionExePath = FusionFacet.autoDetectFusionPath();
         if (fusionExePath != null) {
             File fusionPythonSdkPath =
@@ -70,6 +71,31 @@ public class FusionPythonSdkFlavor extends PythonSdkFlavor {
             if (fusionPythonSdkPath.exists()) {
                 return fusionPythonSdkPath.getAbsolutePath();
             }
+        }
+        return null;
+    }
+
+    @Nullable
+    private String findFusionPythonSdkPathMac() {
+        String fusionExePath = FusionFacet.autoDetectFusionPath();
+        if (fusionExePath != null) {
+            File fusionPythonSdkPath =
+                    new File(new File(fusionExePath).getParentFile().getParentFile(),
+                        "Frameworks/Python.framework/Versions/Current/bin/python");
+            if (fusionPythonSdkPath.exists()) {
+
+                return fusionPythonSdkPath.getAbsolutePath();
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    private String findFusionPythonSdkPath() {
+        if (SystemInfo.isWindows) {
+            return findFusionPythonSdkPathWindows();
+        } else if (SystemInfo.isMac) {
+            return findFusionPythonSdkPathMac();
         }
         return null;
     }
