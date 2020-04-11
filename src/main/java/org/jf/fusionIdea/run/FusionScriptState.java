@@ -69,6 +69,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Enumeration;
 
 public class FusionScriptState implements DebuggableRunProfileState {
     private final Project project;
@@ -239,11 +241,29 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
         private MulticastSocket sendIpv6SSDPRequest() {
             try {
+                Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+
                 InetSocketAddress multicastAddress = new InetSocketAddress(
                         "ff01:fb68:e6b7:45f9:4acc:2559:6c6e:c014", 1900);
                 MulticastSocket socket = new MulticastSocket(0);
                 socket.setLoopbackMode(/* disabled= */ false);
-                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
+
+                for (NetworkInterface netint : Collections.list(nets)) {
+                    if (netint.supportsMulticast()) {
+                        boolean hasIpV6 = false;
+                        for (InetAddress address : Collections.list(netint.getInetAddresses())) {
+                            if (address instanceof Inet6Address) {
+                                hasIpV6 = true;
+                                break;
+                            }
+                        }
+                        if (hasIpV6) {
+                            socket.setNetworkInterface(netint);
+                            socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
+                        }
+                    }
+                }
+
                 return socket;
             } catch (IOException ex) {
                 FusionIdeaPlugin.log.debug("ipv6 ssdp failed");
