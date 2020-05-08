@@ -29,6 +29,7 @@
 
 package org.jf.fusionIdea.facet;
 
+import com.google.common.io.CharStreams;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
@@ -57,14 +58,23 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.FusionIdeaPlugin;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class FusionFacet extends LibraryContributingFacet<FusionFacetConfiguration> {
 
     private static final String LIB_NAME = "Fusion 360 API";
+
+    private long latestAddinVersionTimestampNanos;
+    private Float latestAddinVersion;
 
     public FusionFacet(@NotNull FacetType facetType, @NotNull Module module, @NotNull String name,
                        @NotNull FusionFacetConfiguration configuration, Facet underlyingFacet) {
@@ -290,5 +300,35 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             }
         }
         return targetProcesses;
+    }
+
+    @Nullable
+    public synchronized Float getLatestAddinVersion() {
+        if (latestAddinVersion == null || (System.nanoTime() - latestAddinVersionTimestampNanos) >
+                TimeUnit.NANOSECONDS.convert(1, TimeUnit.HOURS)) {
+
+            // We'll immediately return null or the old value below, but then we'll asynchronously update it in the
+            // background.
+            ApplicationManager.getApplication().executeOnPooledThread(() -> {
+                String version = null;
+                try {
+                    URL url = new URL("https://raw.githubusercontent.com/JesusFreke/fusion_idea_addin/master/VERSION");
+                    HttpURLConnection yc = (HttpURLConnection)url.openConnection();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+                    version = CharStreams.toString(in);
+                    synchronized (FusionFacet.this) {
+                        latestAddinVersion = Float.parseFloat(version);
+                        latestAddinVersionTimestampNanos = System.nanoTime();
+                    }
+                } catch (MalformedURLException ex) {
+                    throw new RuntimeException(ex);
+                } catch (IOException ex) {
+                    FusionIdeaPlugin.log.warn("Error getting latest version of add-in", ex);
+                } catch (NumberFormatException ex) {
+                    FusionIdeaPlugin.log.warn("Got add-in version with unexpected format: " + version, ex);
+                }
+            });
+        }
+        return latestAddinVersion;
     }
 }

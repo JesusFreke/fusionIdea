@@ -57,6 +57,7 @@ import org.jetbrains.concurrency.Promise;
 import org.jetbrains.concurrency.Promises;
 import org.jetbrains.ide.PooledThreadExecutor;
 import org.jf.fusionIdea.FusionIdeaPlugin;
+import org.jf.fusionIdea.facet.FusionFacet;
 import rawhttp.core.RawHttp;
 import rawhttp.core.RawHttpResponse;
 
@@ -202,7 +203,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
         }
     }
 
-    private static class SSDPServer {
+    private class SSDPServer {
         private final int targetPid;
 
         public SSDPServer(int targetPid) {
@@ -360,6 +361,28 @@ public class FusionScriptState implements DebuggableRunProfileState {
                         continue;
                     }
 
+                    String serverHeader = response.getHeaders().getFirst("SERVER").orElse(null);
+                    if (!serverHeader.startsWith("fusion_idea/")) {
+                        FusionIdeaPlugin.log.debug("Unexpected format for SERVER header: %s", serverHeader);
+                    } else {
+                        String versionString = serverHeader.substring(12);
+                        try {
+                            float version = Float.parseFloat(versionString);
+
+                            FusionFacet fusionFacet = FusionFacet.getInstance(fusionRunConfiguration.getModule());
+                            Float latestVersion = fusionFacet.getLatestAddinVersion();
+
+                            if (latestVersion != null && latestVersion > version) {
+                                processHandler.notifyTextAvailable(
+                                        "\nA new version of fusion_idea_addin is available: " + latestVersion + "\n" +
+                                            "See https://github.com/JesusFreke/fusion_idea_addin/wiki/Installing-the-" +
+                                            "add-in-in-Fusion-360 for installation instructions.\n\n",
+                                        ProcessOutputTypes.SYSTEM);
+                            }
+                        } catch (NumberFormatException ex) {
+                            FusionIdeaPlugin.log.debug("Unexpected format for version number: %f", versionString);
+                        }
+                    }
                     remoteDebugPort = remotePort;
                     break;
                 } while (Duration.ofNanos(System.nanoTime() - startTime).compareTo(Duration.ofSeconds(1)) <= 0);
