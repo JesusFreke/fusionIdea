@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>org.jf.fusionIdea</id>
     <name>Fusion 360 Scripting</name>
-    <version>0.6.0</version>
+    <version>0.6.1</version>
     <vendor email="jesusfreke@jesusfreke.com" url="https://github.com/JesusFreke/fusionIdea">Ben Gruver</vendor>
     <description>
 <![CDATA[
@@ -87,8 +87,13 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.0"><b>v0.6.0</b></a> (2020-04-11) <br/>
-        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.7...v0.6.0"><small>Changelog</small></a> <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.1"><b>v0.6.1</b></a> (2020-04-11) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.0...v0.6.1"><small>v0.6.1 Changelog</small></a> <br/>
+        <ul>
+            <li>Fixed an issue when adding a new configuration in the Run Configuration dialog in 2020.1</li>
+            <li>Added a check for the add-in version, with a message in the debug console when a new version is available.</li>
+        </ul>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.5.7...v0.6.0"><small>v0.6.0 Changelog</small></a> <br/>
         <ul>
             <li>Added support for Mac</li>
             <li>An add-in is now required (again) in Fusion 360. See
