@@ -67,12 +67,7 @@ public class FusionConfigurable implements SearchableConfigurable {
     public FusionConfigurable(Project project) {
         this.project = project;
 
-        Module[] modules = ModuleManager.getInstance(project).getModules();
-        if (modules.length == 0) {
-            throw new IllegalStateException("Current project has no modules");
-        }
-
-        FusionFacet facet = FusionFacet.getInstance(modules[0]);
+        FusionFacet facet = FusionFacet.getInstance(project);
         if (facet != null) {
             configuration = facet.getConfiguration();
             fusionSupportEnabled = true;

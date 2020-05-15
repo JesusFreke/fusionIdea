@@ -369,7 +369,13 @@ public class FusionScriptState implements DebuggableRunProfileState {
                         try {
                             float version = Float.parseFloat(versionString);
 
-                            FusionFacet fusionFacet = FusionFacet.getInstance(fusionRunConfiguration.getModule());
+                            FusionFacet fusionFacet;
+
+                            if (fusionRunConfiguration != null) {
+                                fusionFacet = FusionFacet.getInstance(fusionRunConfiguration.getModule());
+                            } else {
+                                fusionFacet = FusionFacet.getInstance(project);
+                            }
                             Float latestVersion = fusionFacet.getLatestAddinVersion();
 
                             if (latestVersion != null && latestVersion > version) {

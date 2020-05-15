@@ -38,7 +38,9 @@ import com.intellij.facet.ModifiableFacetModel;
 import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx.ModifiableModelEx;
@@ -83,6 +85,16 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
 
     @Nullable public static FusionFacet getInstance(Module module) {
         return FacetManager.getInstance(module).getFacetByType(FusionFacetType.ID);
+    }
+
+    @Nullable public static FusionFacet getInstance(Project project) {
+        for (Module module: ModuleManager.getInstance(project).getModules()) {
+            FusionFacet facet = FusionFacet.getInstance(module);
+            if (facet != null) {
+                return facet;
+            }
+        }
+        return null;
     }
 
     public void updateLibrary(FacetEditorContext editorContext) {
