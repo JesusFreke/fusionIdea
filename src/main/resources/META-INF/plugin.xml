@@ -87,6 +87,11 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.2"><b>v0.6.2</b></a> (2020-06-07) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.1...v0.6.2"><small>v0.6.2 Changelog</small></a> <br/>
+        <ul>
+            <li>Fixed an NPE when attaching to the Fusion process</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.1"><b>v0.6.1</b></a> (2020-04-11) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.0...v0.6.1"><small>v0.6.1 Changelog</small></a> <br/>
         <ul>
