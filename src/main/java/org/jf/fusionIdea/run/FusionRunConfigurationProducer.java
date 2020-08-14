@@ -96,6 +96,7 @@ public class FusionRunConfigurationProducer extends LazyRunConfigurationProducer
         }
         configuration.setScript(vFile.getPath());
         configuration.setName(configuration.suggestedName());
+        configuration.setModule(module);
         return true;
     }
 
