@@ -635,6 +635,9 @@ class _PyDevCommandProcessor(object):
             frame = None
             t = None
 
+    def cmd_get_smart_step_into_variants(self, py_db, cmd_id, seq, text):
+        return NetCommand(cmd_id, seq, "<xml></xml>")
+
 
 process_net_command = _PyDevCommandProcessor().process_net_command
 
