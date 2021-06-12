@@ -29,10 +29,7 @@
 
 package org.jf.fusionIdea.run;
 
-import com.intellij.execution.configurations.ConfigurationFactory;
-import com.intellij.execution.configurations.ConfigurationType;
-import com.intellij.execution.configurations.ConfigurationTypeUtil;
-import com.intellij.execution.configurations.RunConfiguration;
+import com.intellij.execution.configurations.*;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.run.PythonConfigurationFactoryBase;
 import org.jetbrains.annotations.NotNull;
@@ -73,13 +70,8 @@ public class FusionRunConfigurationType implements ConfigurationType {
       super(type);
     }
 
-    @Override
-    public boolean isConfigurationSingletonByDefault() {
-      return false;
-    }
-
-    @Override public boolean canConfigurationBeSingleton() {
-      return false;
+    @NotNull @Override public RunConfigurationSingletonPolicy getSingletonPolicy() {
+      return RunConfigurationSingletonPolicy.SINGLE_INSTANCE;
     }
 
     @NotNull
