@@ -47,7 +47,7 @@ import com.intellij.execution.process.ProcessOutputTypes;
 import com.intellij.execution.runners.DebuggableRunProfileState;
 import com.intellij.execution.runners.ProgramRunner;
 import com.intellij.ide.plugins.IdeaPluginDescriptor;
-import com.intellij.ide.plugins.PluginManager;
+import com.intellij.ide.plugins.PluginManagerCore;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.extensions.PluginId;
 import com.intellij.openapi.project.Project;
@@ -143,7 +143,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
     }
 
     private void sendStartScriptHttpRequest(int port) {
-        IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId(FusionIdeaPlugin.ID));
+        IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(FusionIdeaPlugin.ID));
         assert plugin != null;
 
         String pydevdPath = new File(new File(plugin.getPath(), "lib"), "pydevd-1.9.0").getAbsolutePath();
