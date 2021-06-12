@@ -49,7 +49,7 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
-import com.jetbrains.python.sdk.PythonSdkType;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -136,11 +136,11 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     @Nullable public Sdk getSdk() {
         if (useModuleSdk) {
-            return PythonSdkType.findPythonSdk(getModule());
+            return PythonSdkUtil.findPythonSdk(getModule());
         } else if (StringUtil.isEmpty(getSdkHome())) {
             return ProjectRootManager.getInstance(getProject()).getProjectSdk();
         }
-        return PythonSdkType.findSdkByPath(getSdkHome());
+        return PythonSdkUtil.findSdkByPath(getSdkHome());
     }
 
     public boolean useModuleSdk() {

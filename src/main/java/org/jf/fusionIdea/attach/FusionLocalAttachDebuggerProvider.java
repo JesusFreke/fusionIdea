@@ -53,6 +53,7 @@ import com.jetbrains.python.debugger.PyRemoteDebugProcess;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
 import com.jetbrains.python.sdk.PythonSdkType;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.facet.FusionFacet;
 import org.jf.fusionIdea.run.FusionScriptState;
@@ -86,10 +87,10 @@ public class FusionLocalAttachDebuggerProvider
 
         final Sdk selectedSdk = selected;
         // most recent python version goes first
-        final List<XLocalAttachDebugger> result = PythonSdkType.getAllLocalCPythons()
+        final List<XLocalAttachDebugger> result = PythonSdkUtil.getAllLocalCPythons()
                 .stream()
                 .filter(sdk -> sdk != selectedSdk)
-                .filter(sdk -> !PythonSdkType.isInvalid(sdk))
+                .filter(sdk -> !PythonSdkUtil.isInvalid(sdk))
                 .sorted(PreferredSdkComparator.INSTANCE)
                 .map(PyLocalAttachDebugger::new)
                 .collect(Collectors.toList());

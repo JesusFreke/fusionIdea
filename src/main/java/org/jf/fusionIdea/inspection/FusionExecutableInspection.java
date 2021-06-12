@@ -51,7 +51,7 @@ import com.intellij.util.PlatformUtils;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
 import com.jetbrains.python.psi.PyFile;
-import com.jetbrains.python.sdk.PythonSdkType;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -144,7 +144,7 @@ public class FusionExecutableInspection extends PyInspection {
                 facet.getConfiguration().setFusionPath(newPath);
                 facet.updateLibrary();
 
-                Sdk sdk = PythonSdkType.findPythonSdk(module);
+                Sdk sdk = PythonSdkUtil.findPythonSdk(module);
                 if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
                     updateSdk(sdk, newPath);
                 }
@@ -183,7 +183,7 @@ public class FusionExecutableInspection extends PyInspection {
             facet.getConfiguration().setFusionPath(newPath);
             facet.updateLibrary();
 
-            Sdk sdk = PythonSdkType.findPythonSdk(module);
+            Sdk sdk = PythonSdkUtil.findPythonSdk(module);
             if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !sdk.getHomeDirectory().exists()) {
                 updateSdk(sdk, newPath);
             }

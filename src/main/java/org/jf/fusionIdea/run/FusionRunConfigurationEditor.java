@@ -49,7 +49,7 @@ import com.intellij.ui.PanelWithAnchor;
 import com.jetbrains.extensions.python.FileChooserDescriptorExtKt;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
-import com.jetbrains.python.sdk.PythonSdkType;
+import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -170,7 +170,7 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
     public void setSdkHome(String sdkHome) {
         List<Sdk> sdkList = new ArrayList<>();
         sdkList.add(null);
-        final List<Sdk> allSdks = PythonSdkType.getAllSdks();
+        final List<Sdk> allSdks = PythonSdkUtil.getAllSdks();
         Collections.sort(allSdks, new PreferredSdkComparator());
         Sdk selection = null;
         for (Sdk sdk : allSdks) {
