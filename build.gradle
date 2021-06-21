@@ -34,5 +34,18 @@ task copyStubs(dependsOn: prepareSandbox, type: Copy) {
     into "${intellij.sandboxDirectory}/plugins/fusion_idea/lib"
 }
 
+jar {
+    // This is a workaround for a change in behavior for how these dependency files for optional dependencies are specified.
+    // in/aronud 2021.1.2, the behavior changed so that you have to specify the full path from the root of the plugin zip
+    // to the file, vs. the old behavior of specifying a path relative to the META-INF folder.
+    //
+    // The workaround is to just use the same path as before, and make duplicate copies of the files in both the root
+    // and the META-INF folder
+    from("src/main/resources/META-INF") {
+        include "intellij.xml"
+        include "pycharm.xml"
+    }
+}
+
 buildPlugin.dependsOn copyStubs
 runIde.dependsOn copyStubs
