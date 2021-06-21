@@ -87,6 +87,13 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.3"><b>v0.6.3</b></a> (2021-06-21) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.2...v0.6.3"><small>v0.6.3 Changelog</small></a> <br/>
+        <ul>
+            <li>Added a workaround for <a href="https://youtrack.jetbrains.com/issue/IDEA-270963">IDEA-270963</a>
+            <li>Added a fix for a long hang when trying to use step-into when debugging a script</li>
+            <li>Various minor updates and changes for methods that are deprecated in IDEA</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.2"><b>v0.6.2</b></a> (2020-06-07) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.1...v0.6.2"><small>v0.6.2 Changelog</small></a> <br/>
         <ul>
