@@ -32,6 +32,7 @@ package org.jf.fusionIdea.run;
 import com.intellij.execution.configurations.*;
 import com.intellij.openapi.project.Project;
 import com.jetbrains.python.run.PythonConfigurationFactoryBase;
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.FusionIdeaIcons;
 
@@ -82,6 +83,10 @@ public class FusionRunConfigurationType implements ConfigurationType {
     @Override
     public String getName() {
       return "Fusion 360 Python Script";
+    }
+
+    @Override public @NotNull @NonNls String getId() {
+      return getName();
     }
   }
 }
