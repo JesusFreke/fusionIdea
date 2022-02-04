@@ -80,7 +80,7 @@ etc.</li>
 
     </description>
 
-    <idea-version since-build="193.2252"/>
+    <idea-version since-build="213.6667"/>
 
     <depends optional="true" config-file="intellij.xml">com.intellij.modules.java</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
