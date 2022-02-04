@@ -45,11 +45,13 @@ import com.intellij.xdebugger.XDebugProcess;
 import com.intellij.xdebugger.XDebugProcessStarter;
 import com.intellij.xdebugger.XDebugSession;
 import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.attach.XAttachDebugger;
+import com.intellij.xdebugger.attach.XAttachHost;
 import com.intellij.xdebugger.attach.XAttachPresentationGroup;
-import com.intellij.xdebugger.attach.XLocalAttachDebugger;
 import com.jetbrains.python.debugger.PyDebugRunner;
 import com.jetbrains.python.debugger.PyLocalPositionConverter;
 import com.jetbrains.python.debugger.PyRemoteDebugProcess;
+import com.jetbrains.python.debugger.attach.PyLocalAttachDebuggerProvider;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
 import com.jetbrains.python.sdk.PythonSdkType;
@@ -66,8 +68,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class FusionLocalAttachDebuggerProvider
-        extends com.jetbrains.python.debugger.attach.PyLocalAttachDebuggerProvider {
+public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProvider {
 
     private static final Key<Set<String>> FUSION_EXECUTABLES =
             Key.create("FusionLocalAttachDebuggerProvider.FUSION_EXECUTABLES");
@@ -75,7 +76,7 @@ public class FusionLocalAttachDebuggerProvider
     private static final int CONNECTION_TIMEOUT = 20000;
 
     @NotNull
-    private static List<XLocalAttachDebugger> getAttachDebuggersForAllLocalSdks(@NotNull Project project) {
+    private static List<XAttachDebugger> getAttachDebuggersForAllLocalSdks(@NotNull Project project) {
         Sdk selected = null;
         RunnerAndConfigurationSettings settings = RunManager.getInstance(project).getSelectedConfiguration();
         if (settings != null) {
@@ -87,7 +88,7 @@ public class FusionLocalAttachDebuggerProvider
 
         final Sdk selectedSdk = selected;
         // most recent python version goes first
-        final List<XLocalAttachDebugger> result = PythonSdkUtil.getAllLocalCPythons()
+        final List<XAttachDebugger> result = PythonSdkUtil.getAllLocalCPythons()
                 .stream()
                 .filter(sdk -> sdk != selectedSdk)
                 .filter(sdk -> !PythonSdkUtil.isInvalid(sdk))
@@ -101,8 +102,8 @@ public class FusionLocalAttachDebuggerProvider
     }
 
     @NotNull @Override
-    public List<XLocalAttachDebugger> getAvailableDebuggers(
-            @NotNull Project project, @NotNull ProcessInfo processInfo, @NotNull UserDataHolder contextHolder) {
+    public List<XAttachDebugger> getAvailableDebuggers(
+            @NotNull Project project, @NotNull XAttachHost hostInfo, @NotNull ProcessInfo processInfo, @NotNull UserDataHolder contextHolder) {
 
         Set<String> fusionExecutables = contextHolder.getUserData(FUSION_EXECUTABLES);
         if (fusionExecutables == null) {
@@ -135,18 +136,13 @@ public class FusionLocalAttachDebuggerProvider
         return FusionLocalAttachGroup.INSTANCE;
     }
 
-    private static class PyLocalAttachDebugger implements XLocalAttachDebugger {
+    private static class PyLocalAttachDebugger implements XAttachDebugger {
         private final String sdkPath;
         @NotNull private final String myName;
 
         public PyLocalAttachDebugger(@NotNull Sdk sdk) {
             sdkPath = sdk.getHomePath();
             myName = PythonSdkType.getInstance().getVersionString(sdk) + " (" + sdkPath + ")";
-        }
-
-        public PyLocalAttachDebugger(@NotNull String sdkPath) {
-            this.sdkPath = sdkPath;
-            myName = "Python Debugger";
         }
 
         @NotNull
@@ -156,8 +152,7 @@ public class FusionLocalAttachDebuggerProvider
         }
 
         @Override
-        public void attachDebugSession(@NotNull Project project, @NotNull ProcessInfo processInfo)
-                throws ExecutionException {
+        public void attachDebugSession(@NotNull Project project, @NotNull XAttachHost hostInfo, @NotNull ProcessInfo processInfo) throws ExecutionException {
             launchDebugger(project, processInfo.getPid());
         }
     }

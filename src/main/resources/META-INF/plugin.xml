@@ -121,7 +121,7 @@ etc.</li>
     </change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
-        <xdebugger.localAttachDebuggerProvider implementation="org.jf.fusionIdea.attach.FusionLocalAttachDebuggerProvider"/>
+        <xdebugger.attachDebuggerProvider implementation="org.jf.fusionIdea.attach.FusionLocalAttachDebuggerProvider"/>
         <configurationType implementation="org.jf.fusionIdea.run.FusionRunConfigurationType"/>
         <programRunner implementation="org.jf.fusionIdea.run.FusionDebugRunner" order="first"/>
         <programRunner implementation="org.jf.fusionIdea.run.FusionRunner" order="first"/>
