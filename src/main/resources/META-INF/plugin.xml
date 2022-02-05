@@ -87,6 +87,11 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.4"><b>v0.6.4</b></a> (2022-02-04) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.3...v0.6.4"><small>v0.6.4 Changelog</small></a> <br/>
+        <ul>
+            <li>Updated plugin to work with IDEA/PyCharm 2021.3.2, which is the version the plugin now requires.</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.3"><b>v0.6.3</b></a> (2021-06-21) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.2...v0.6.3"><small>v0.6.3 Changelog</small></a> <br/>
         <ul>
