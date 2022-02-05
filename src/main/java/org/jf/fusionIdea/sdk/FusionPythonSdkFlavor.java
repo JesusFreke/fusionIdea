@@ -31,6 +31,7 @@ package org.jf.fusionIdea.sdk;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.util.SystemInfo;
+import com.intellij.openapi.util.UserDataHolder;
 import com.jetbrains.python.sdk.flavors.PythonFlavorProvider;
 import com.jetbrains.python.sdk.flavors.PythonSdkFlavor;
 import org.jetbrains.annotations.NotNull;
@@ -51,7 +52,9 @@ public class FusionPythonSdkFlavor extends PythonSdkFlavor {
         return "Fusion 360 Python SDK";
     }
 
-    @Override public Collection<String> suggestHomePaths(@Nullable Module module) {
+    @Override public Collection<String> suggestHomePaths(
+            @Nullable Module module,
+            @Nullable UserDataHolder context) {
         List<String> paths = new ArrayList<>();
 
         String sdkPath = findFusionPythonSdkPath();

@@ -67,7 +67,7 @@ public class AddFusionSdkView extends JPanel implements PyAddSdkView {
 
         List<Sdk> sdks = new ArrayList<>();
 
-        for (String path : FusionPythonSdkFlavor.INSTANCE.suggestHomePaths(null)) {
+        for (String path : FusionPythonSdkFlavor.INSTANCE.suggestHomePaths(null, null)) {
             sdks.add(new PyDetectedSdk(path));
         }
 
