@@ -33,6 +33,7 @@ import com.intellij.execution.ExecutionTarget;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
+import com.intellij.openapi.project.Project;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.FusionIdeaIcons;
@@ -41,9 +42,11 @@ import org.jf.fusionIdea.facet.FusionFacet;
 import javax.swing.*;
 
 public class FusionExecutionTarget extends ExecutionTarget {
+    private final Project project;
     private final ProcessInfo targetProcess;
 
-    public FusionExecutionTarget(ProcessInfo targetProcess) {
+    public FusionExecutionTarget(Project project, ProcessInfo targetProcess) {
+        this.project = project;
         this.targetProcess = targetProcess;
     }
 
@@ -68,7 +71,7 @@ public class FusionExecutionTarget extends ExecutionTarget {
     }
 
     @Override public boolean isReady() {
-        for (ProcessInfo processInfo : FusionFacet.getProcesses()) {
+        for (ProcessInfo processInfo : FusionFacet.getProcesses(project)) {
             if (processInfo.getPid() == this.targetProcess.getPid()) {
                 return true;
             }

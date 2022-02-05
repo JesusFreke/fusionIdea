@@ -29,6 +29,7 @@
 
 package org.jf.fusionIdea.facet;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.facet.Facet;
@@ -39,7 +40,8 @@ import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.progress.ProgressManager;
+import com.intellij.openapi.progress.ProgressIndicator;
+import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
@@ -48,7 +50,6 @@ import com.intellij.openapi.roots.libraries.Library;
 import com.intellij.openapi.roots.libraries.LibraryTable;
 import com.intellij.openapi.util.Computable;
 import com.intellij.openapi.util.SystemInfo;
-import com.intellij.openapi.util.ThrowableComputable;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -77,6 +78,7 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
 
     private long latestAddinVersionTimestampNanos;
     private Float latestAddinVersion;
+    private static volatile List<ProcessInfo> lastProcessList = ImmutableList.of();
 
     public FusionFacet(@NotNull FacetType facetType, @NotNull Module module, @NotNull String name,
                        @NotNull FusionFacetConfiguration configuration, Facet underlyingFacet) {
@@ -277,14 +279,21 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         updateLibrary();
     }
 
-    public static List<ProcessInfo> getProcesses() {
-        try {
-            return ProgressManager.getInstance().runProcessWithProgressSynchronously(
-                    (ThrowableComputable<List<ProcessInfo>, com.intellij.execution.ExecutionException>)() ->
-                            LocalAttachHost.INSTANCE.getProcessList(), "Getting process list", false, null);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
+    public static List<ProcessInfo> getProcesses(Project project) {
+        if (ApplicationManager.getApplication().isDispatchThread()) {
+            // There doesn't seem to be a safe way to retrieve the list of processes on the dispatch thread.
+            // This method *is* called on the dispatch thread on occasion, but it's mostly not. So we
+            // just return the last process list, and then kick off a background task to update the list.
+
+            new Task.Backgroundable(project, "Retreiving processes") {
+                @Override public void run(@NotNull ProgressIndicator indicator) {
+                    lastProcessList = LocalAttachHost.INSTANCE.getProcessList();
+                }
+            }.queue();
+        } else {
+            lastProcessList = LocalAttachHost.INSTANCE.getProcessList();
         }
+        return lastProcessList;
     }
 
     public List<ProcessInfo> findTargetProcesses() {
@@ -301,7 +310,7 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             canonicalFusionPath = fusionPath;
         }
 
-        for (ProcessInfo processInfo : getProcesses()) {
+        for (ProcessInfo processInfo : getProcesses(getModule().getProject())) {
             if (processInfo.getExecutableCannonicalPath().isPresent() &&
                     processInfo.getExecutableCannonicalPath().get().equals(canonicalFusionPath)) {
                 targetProcesses.add(processInfo);

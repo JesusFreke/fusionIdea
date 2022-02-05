@@ -31,7 +31,7 @@ package org.jf.fusionIdea.run;
 
 import com.intellij.execution.ExecutionTarget;
 import com.intellij.execution.ExecutionTargetProvider;
-import com.intellij.execution.RunnerAndConfigurationSettings;
+import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -45,15 +45,16 @@ public class FusionExecutionTargetProvider extends ExecutionTargetProvider {
 
     @NotNull @Override
     public List<ExecutionTarget> getTargets(@NotNull Project project,
-                                            @NotNull RunnerAndConfigurationSettings configuration) {
-        if (configuration.getType() != FusionRunConfigurationType.getInstance()) {
+                                            @NotNull RunConfiguration runConfiguration) {
+
+        if (runConfiguration.getType() != FusionRunConfigurationType.getInstance()) {
             return Collections.emptyList();
         }
 
-        FusionRunConfiguration runConfiguration = (FusionRunConfiguration)configuration.getConfiguration();
+        FusionRunConfiguration fusionRunConfiguration = (FusionRunConfiguration)runConfiguration;
 
         Map<Integer, ProcessInfo> targetProcesses = new HashMap<>();
-        for (Module module : getApplicableModules(runConfiguration)) {
+        for (Module module : getApplicableModules(fusionRunConfiguration)) {
             FusionFacet facet = FusionFacet.getInstance(module);
             if (facet != null) {
                 for (ProcessInfo processInfo : facet.findTargetProcesses()) {
@@ -62,7 +63,7 @@ public class FusionExecutionTargetProvider extends ExecutionTargetProvider {
             }
         }
 
-        return buildTargets(targetProcesses.values());
+        return buildTargets(project, targetProcesses.values());
     }
 
     private List<Module> getApplicableModules(FusionRunConfiguration runConfiguration) {
@@ -74,11 +75,12 @@ public class FusionExecutionTargetProvider extends ExecutionTargetProvider {
         }
     }
 
-    private List<ExecutionTarget> buildTargets(Collection<ProcessInfo> targetProcesses) {
+    private List<ExecutionTarget> buildTargets(Project project, Collection<ProcessInfo> targetProcesses) {
+
         List<ExecutionTarget> targets = new ArrayList<>();
 
         for (ProcessInfo targetProcess : targetProcesses) {
-            targets.add(new FusionExecutionTarget(targetProcess));
+            targets.add(new FusionExecutionTarget(project, targetProcess));
         }
 
         return targets;
