@@ -30,7 +30,6 @@
 package org.jf.fusionIdea.run;
 
 import com.intellij.execution.ExecutionTarget;
-import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.openapi.project.Project;
@@ -60,10 +59,6 @@ public class FusionExecutionTarget extends ExecutionTarget {
 
     @Nullable @Override public Icon getIcon() {
         return FusionIdeaIcons.LOGO;
-    }
-
-    @Override public boolean canRun(@NotNull RunnerAndConfigurationSettings configuration) {
-        return configuration.getType() == FusionRunConfigurationType.getInstance();
     }
 
     public int getPid() {
