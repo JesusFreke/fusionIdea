@@ -51,6 +51,7 @@ import com.intellij.util.PlatformUtils;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
 import com.jetbrains.python.psi.PyFile;
+import com.jetbrains.python.psi.types.TypeEvalContext;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
@@ -72,14 +73,14 @@ public class FusionExecutableInspection extends PyInspection {
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder,
                                           final boolean isOnTheFly,
                                           @NotNull final LocalInspectionToolSession session) {
-        return new Visitor(holder, session);
+        return new Visitor(holder, PyInspectionVisitor.getContext(session));
     }
 
     public static class Visitor extends PyInspectionVisitor {
 
         public Visitor(@Nullable ProblemsHolder holder,
-                       @NotNull LocalInspectionToolSession session) {
-            super(holder, session);
+                       @NotNull TypeEvalContext context) {
+            super(holder, context);
         }
 
         @Override
