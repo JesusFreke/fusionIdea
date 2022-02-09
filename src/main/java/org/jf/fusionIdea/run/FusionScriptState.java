@@ -67,6 +67,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.security.*;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -146,7 +147,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
         IdeaPluginDescriptor plugin = PluginManagerCore.getPlugin(PluginId.getId(FusionIdeaPlugin.ID));
         assert plugin != null;
 
-        String pydevdPath = new File(new File(plugin.getPath(), "lib"), "pydevd-1.9.0").getAbsolutePath();
+        String pydevdPath = plugin.getPluginPath().resolve(Path.of("lib", "pydevd-1.9.0")).toAbsolutePath().toString();
 
         ImmutableMap.Builder<String, String> innerRequestBuilder = ImmutableMap.builder();
 
