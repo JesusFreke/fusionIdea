@@ -40,6 +40,7 @@ import com.intellij.openapi.util.Ref;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.util.QualifiedName;
 import com.intellij.testFramework.LightVirtualFile;
 import com.jetbrains.python.PythonFileType;
 import com.jetbrains.python.psi.PyFile;
@@ -105,14 +106,16 @@ public class FusionRunConfigurationProducer extends LazyRunConfigurationProducer
 
         @Override public void visitPyFile(PyFile node) {
             for (PyImportElement pyimport: node.getImportTargets()) {
-                if (pyimport.getImportedQName().getFirstComponent().equals("adsk")) {
+                QualifiedName qname = pyimport.getImportedQName();
+                if (qname != null && "adsk".equals(qname.getFirstComponent())) {
                     looksLikeFusionScript = true;
                     break;
                 }
             }
             if (!looksLikeFusionScript) {
                 for (PyFromImportStatement statement : node.getFromImports()) {
-                    if (statement.getImportSourceQName().getFirstComponent().equals("adsk")) {
+                    QualifiedName qname = statement.getImportSourceQName();
+                    if (qname != null && "adsk".equals(qname.getFirstComponent())) {
                         looksLikeFusionScript = true;
                         break;
                     }
