@@ -29,10 +29,7 @@
 
 package org.jf.fusionIdea.run;
 
-import com.intellij.execution.ExecutionException;
-import com.intellij.execution.ExecutionTarget;
-import com.intellij.execution.ExecutionTargetManager;
-import com.intellij.execution.Executor;
+import com.intellij.execution.*;
 import com.intellij.execution.configurations.*;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.RunConfigurationWithSuppressedDefaultRunAction;
@@ -91,7 +88,13 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         FusionExecutionTarget target = (FusionExecutionTarget) environment.getExecutionTarget();
         if (!target.isReady()) {
             ExecutionTargetManager manager = ExecutionTargetManager.getInstance(getProject());
-            List<ExecutionTarget> targets = manager.getTargetsFor(environment.getRunnerAndConfigurationSettings());
+            RunnerAndConfigurationSettings runnerAndConfigurationSettings = environment.getRunnerAndConfigurationSettings();
+            RunConfiguration runConfiguration = null;
+            if (runnerAndConfigurationSettings != null) {
+                runConfiguration = runnerAndConfigurationSettings.getConfiguration();
+            }
+
+            List<ExecutionTarget> targets = manager.getTargetsFor(runConfiguration);
             if (targets.size() == 1) {
                 // If there's only a single process, we'll just automatically update and use the new target.
                 manager.update();
