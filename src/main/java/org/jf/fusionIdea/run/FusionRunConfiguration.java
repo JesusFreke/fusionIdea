@@ -69,7 +69,7 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
 
     public FusionRunConfiguration(Project project, ConfigurationFactory factory) {
         super(new RunConfigurationModule(project), factory);
-        getConfigurationModule().init();
+        getConfigurationModule().setModuleToAnyFirstIfNotSpecified();
     }
 
     @Override public boolean canRunOn(@NotNull ExecutionTarget target) {
