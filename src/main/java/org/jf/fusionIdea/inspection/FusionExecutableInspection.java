@@ -33,6 +33,9 @@ import com.intellij.codeInspection.LocalInspectionToolSession;
 import com.intellij.codeInspection.LocalQuickFix;
 import com.intellij.codeInspection.ProblemDescriptor;
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.facet.FacetManager;
+import com.intellij.facet.ModifiableFacetModel;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtilCore;
@@ -58,6 +61,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jf.fusionIdea.FusionIdeaPlugin;
 import org.jf.fusionIdea.facet.FusionFacet;
+import org.jf.fusionIdea.facet.FusionFacetType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -136,19 +140,25 @@ public class FusionExecutableInspection extends PyInspection {
 
         @Override
         public void applyFix(@NotNull final Project project, @NotNull ProblemDescriptor descriptor) {
+
             ModuleManager moduleManager = ModuleManager.getInstance(project);
             for (Module module : moduleManager.getModules()) {
-                FusionFacet facet = FusionFacet.getInstance(module);
+                ModifiableFacetModel facetModel = FacetManager.getInstance(module).createModifiableModel();
+                FusionFacet facet = facetModel.getFacetByType(FusionFacetType.ID);
                 if (facet == null) {
                     continue;
                 }
-                facet.getConfiguration().setFusionPath(newPath);
-                facet.updateLibrary();
 
-                Sdk sdk = PythonSdkUtil.findPythonSdk(module);
-                if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
-                    updateSdk(sdk, newPath);
-                }
+                ApplicationManager.getApplication().runWriteAction(() -> {
+                    facet.getConfiguration().setFusionPath(newPath);
+                    facet.updateLibrary();
+
+                    Sdk sdk = PythonSdkUtil.findPythonSdk(module);
+                    if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
+                        updateSdk(sdk, newPath);
+                    }
+                    facetModel.commit();
+                });
             }
         }
     }
@@ -177,17 +187,22 @@ public class FusionExecutableInspection extends PyInspection {
             if (module == null) {
                 return;
             }
-            FusionFacet facet = FusionFacet.getInstance(module);
+
+            ModifiableFacetModel facetModel = FacetManager.getInstance(module).createModifiableModel();
+            FusionFacet facet = facetModel.getFacetByType(FusionFacetType.ID);
             if (facet == null) {
                 return;
             }
-            facet.getConfiguration().setFusionPath(newPath);
-            facet.updateLibrary();
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                facet.getConfiguration().setFusionPath(newPath);
+                facet.updateLibrary();
 
-            Sdk sdk = PythonSdkUtil.findPythonSdk(module);
-            if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !sdk.getHomeDirectory().exists()) {
-                updateSdk(sdk, newPath);
-            }
+                Sdk sdk = PythonSdkUtil.findPythonSdk(module);
+                if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !sdk.getHomeDirectory().exists()) {
+                    updateSdk(sdk, newPath);
+                }
+                facetModel.commit();
+            });
         }
     }
 

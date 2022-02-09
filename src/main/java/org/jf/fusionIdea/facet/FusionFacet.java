@@ -103,6 +103,7 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
         ApplicationManager.getApplication().runWriteAction(() -> {
             ModifiableRootModel rootModel = editorContext.getModifiableRootModel();
             updateLibrary(rootModel);
+            rootModel.commit();
         });
     }
 
