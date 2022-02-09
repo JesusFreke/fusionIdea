@@ -265,7 +265,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
                 }
 
                 if (!success) {
-                    FusionIdeaPlugin.log.error("Couldn't send ipv6 ssdp packet on any interface");
+                    FusionIdeaPlugin.log.warn("Couldn't send ipv6 ssdp packet on any interface");
                     return null;
                 }
 
