@@ -154,7 +154,7 @@ public class FusionExecutableInspection extends PyInspection {
                     facet.updateLibrary();
 
                     Sdk sdk = PythonSdkUtil.findPythonSdk(module);
-                    if (FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
+                    if (sdk != null && FusionFacet.getFusionSubPath(sdk.getHomePath()) != null && !new File(sdk.getHomePath()).exists()) {
                         updateSdk(sdk, newPath);
                     }
                     facetModel.commit();
