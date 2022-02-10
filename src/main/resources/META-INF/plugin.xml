@@ -87,6 +87,13 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.5"><b>v0.6.5</b></a> (2022-02-09) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.4...v0.6.5"><small>v0.6.5 Changelog</small></a> <br/>
+        <ul>
+            <li>Fix an issue with python files that use relative imports</li>
+            <li>Fix an issue that required the execution target to be manually selected after starting IDEA/PyCharm</li>
+            <li>Fix an issue with the "update fusion executable" inspection, where it wouldn't actually save the changes it was trying to make.</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.4"><b>v0.6.4</b></a> (2022-02-04) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.3...v0.6.4"><small>v0.6.4 Changelog</small></a> <br/>
         <ul>
