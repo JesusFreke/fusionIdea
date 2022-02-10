@@ -29,8 +29,8 @@
 
 package org.jf.fusionIdea.facet;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.io.CharStreams;
+import com.google.common.util.concurrent.SettableFuture;
 import com.intellij.execution.process.ProcessInfo;
 import com.intellij.facet.Facet;
 import com.intellij.facet.FacetManager;
@@ -70,7 +70,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class FusionFacet extends LibraryContributingFacet<FusionFacetConfiguration> {
 
@@ -78,7 +80,6 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
 
     private long latestAddinVersionTimestampNanos;
     private Float latestAddinVersion;
-    private static volatile List<ProcessInfo> lastProcessList = ImmutableList.of();
 
     public FusionFacet(@NotNull FacetType facetType, @NotNull Module module, @NotNull String name,
                        @NotNull FusionFacetConfiguration configuration, Facet underlyingFacet) {
@@ -282,19 +283,24 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
 
     public static List<ProcessInfo> getProcesses(Project project) {
         if (ApplicationManager.getApplication().isDispatchThread()) {
-            // There doesn't seem to be a safe way to retrieve the list of processes on the dispatch thread.
-            // This method *is* called on the dispatch thread on occasion, but it's mostly not. So we
-            // just return the last process list, and then kick off a background task to update the list.
+            SettableFuture<List<ProcessInfo>> future = SettableFuture.create();
 
             new Task.Backgroundable(project, "Retreiving processes") {
                 @Override public void run(@NotNull ProgressIndicator indicator) {
-                    lastProcessList = LocalAttachHost.INSTANCE.getProcessList();
+                    future.set(LocalAttachHost.INSTANCE.getProcessList());
                 }
             }.queue();
+
+            try {
+                return future.get(5, TimeUnit.SECONDS);
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+                FusionIdeaPlugin.log.warn("error getting process list", e);
+                return null;
+            }
+
         } else {
-            lastProcessList = LocalAttachHost.INSTANCE.getProcessList();
+            return LocalAttachHost.INSTANCE.getProcessList();
         }
-        return lastProcessList;
     }
 
     public List<ProcessInfo> findTargetProcesses() {
