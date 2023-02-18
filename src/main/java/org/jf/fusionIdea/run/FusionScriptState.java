@@ -81,6 +81,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
     private final boolean debug;
 
     private ServerSocket serverSocket;
+    private String osName = System.getProperty("os.name").toLowerCase();
 
     public FusionScriptState(Project project, @Nullable FusionRunConfiguration fusionRunConfiguration,
                              int pid, boolean debug) {
@@ -224,10 +225,20 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
         private MulticastSocket sendIpv4SSDPRequest() {
             try {
-                InetAddress LOCALHOST_IPV4 = Inet4Address.getByName("127.0.0.1");
-                MulticastSocket socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV4, 0));
+                MulticastSocket socket;
+                if (osName.contains("mac")) {
+                    // On MacOS, we need to bind the socket to the loopback interface
+                    // to be able to send packets to the multicast group.
+                    InetAddress LOCALHOST_IPV4 = Inet4Address.getByName("127.0.0.1");
+                    socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV4, 0));
+                    socket.setInterface(LOCALHOST_IPV4);
+                    // Also note: For IPv4 to work on MacOS, the IntelliJ/PyCharm VM settings
+                    // must have the `java.net.preferIPv4Stack` system property set to `true`,
+                    // otherwise the VM would forcibly use IPv6 behind the scenes.
+                } else {
+                    socket = new MulticastSocket();
+                }
                 socket.setLoopbackMode(false);
-                socket.setInterface(LOCALHOST_IPV4);
                 DatagramPacket packet = new DatagramPacket(
                     SEARCH_MESSAGE, SEARCH_MESSAGE.length,
                     new InetSocketAddress(
@@ -242,10 +253,17 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
         private MulticastSocket sendIpv6SSDPRequest() {
             try {
-                InetAddress LOCALHOST_IPV6 = Inet6Address.getByName("::1");
-                MulticastSocket socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV6, 0));
+                MulticastSocket socket;
+                if (osName.contains("mac")) {
+                    // On MacOS, we need to bind the socket to the loopback interface
+                    // to be able to send packets to the multicast group.
+                    InetAddress LOCALHOST_IPV6 = Inet6Address.getByName("::1");
+                    socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV6, 0));
+                    socket.setInterface(LOCALHOST_IPV6);
+                } else {
+                    socket = new MulticastSocket();
+                }
                 socket.setLoopbackMode(false);
-                socket.setInterface(LOCALHOST_IPV6);
                 DatagramPacket packet = new DatagramPacket(
                     SEARCH_MESSAGE, SEARCH_MESSAGE.length,
                     new InetSocketAddress(
