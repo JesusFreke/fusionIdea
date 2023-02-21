@@ -81,6 +81,7 @@ public class FusionScriptState implements DebuggableRunProfileState {
     private final boolean debug;
 
     private ServerSocket serverSocket;
+    private String osName = System.getProperty("os.name").toLowerCase();
 
     public FusionScriptState(Project project, @Nullable FusionRunConfiguration fusionRunConfiguration,
                              int pid, boolean debug) {
@@ -211,22 +212,38 @@ public class FusionScriptState implements DebuggableRunProfileState {
             this.targetPid = targetPid;
         }
 
-        private byte[] SEARCH_MESSAGE =
+        private final byte[] SEARCH_MESSAGE =
                 ("M-SEARCH * HTTP/1.1\r\n" +
                 "MAN: \"ssdp:discover\"\r\n" +
                 "MX: 1\r\n" +
                 "ST: fusion_idea:debug\r\n" +
                 "HOST: 127.0.0.1:1900\r\n\r\n").getBytes(StandardCharsets.UTF_8);
 
+        private final int MULTICAST_PORT = 1900;
+        private final String MULTICAST_GROUP_IPV4 = "239.172.243.75";
+        private final String MULTICAST_GROUP_IPV6 = "ff01:fb68:e6b7:45f9:4acc:2559:6c6e:c014";
+
         private MulticastSocket sendIpv4SSDPRequest() {
             try {
-                InetAddress localhost = InetAddress.getByName("127.0.0.1");
-                InetSocketAddress multicastAddress = new InetSocketAddress(
-                        InetAddress.getByName("239.172.243.75"), 1900);
-                MulticastSocket socket = new MulticastSocket(new InetSocketAddress(localhost, 0));
-                socket.setLoopbackMode(/* disabled= */ false);
-                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
-
+                MulticastSocket socket;
+                if (osName.contains("mac")) {
+                    // On MacOS, we need to bind the socket to the loopback interface
+                    // to be able to send packets to the multicast group.
+                    InetAddress LOCALHOST_IPV4 = Inet4Address.getByName("127.0.0.1");
+                    socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV4, 0));
+                    socket.setInterface(LOCALHOST_IPV4);
+                    // Also note: For IPv4 to work on MacOS, the IntelliJ/PyCharm VM settings
+                    // must have the `java.net.preferIPv4Stack` system property set to `true`,
+                    // otherwise the VM would forcibly use IPv6 behind the scenes.
+                } else {
+                    socket = new MulticastSocket();
+                }
+                socket.setLoopbackMode(false);
+                DatagramPacket packet = new DatagramPacket(
+                    SEARCH_MESSAGE, SEARCH_MESSAGE.length,
+                    new InetSocketAddress(
+                        InetAddress.getByName(MULTICAST_GROUP_IPV4), MULTICAST_PORT));
+                socket.send(packet);
                 return socket;
             } catch (IOException ex) {
                 FusionIdeaPlugin.log.debug("ipv4 ssdp failed");
@@ -236,40 +253,22 @@ public class FusionScriptState implements DebuggableRunProfileState {
 
         private MulticastSocket sendIpv6SSDPRequest() {
             try {
-                Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-
-                InetSocketAddress multicastAddress = new InetSocketAddress(
-                        "ff01:fb68:e6b7:45f9:4acc:2559:6c6e:c014", 1900);
-                MulticastSocket socket = new MulticastSocket(0);
-                socket.setLoopbackMode(/* disabled= */ false);
-
-                boolean success = false;
-                for (NetworkInterface netint : Collections.list(nets)) {
-                    try {
-                        if (netint.supportsMulticast()) {
-                            boolean hasIpV6 = false;
-                            for (InetAddress address : Collections.list(netint.getInetAddresses())) {
-                                if (address instanceof Inet6Address) {
-                                    hasIpV6 = true;
-                                    break;
-                                }
-                            }
-                            if (hasIpV6) {
-                                socket.setNetworkInterface(netint);
-                                socket.send(new DatagramPacket(SEARCH_MESSAGE, SEARCH_MESSAGE.length, multicastAddress));
-                                success = true;
-                            }
-                        }
-                    } catch (IOException ex) {
-                        FusionIdeaPlugin.log.debug("ipv6 multicast failed on " + netint.getName(), ex);
-                    }
+                MulticastSocket socket;
+                if (osName.contains("mac")) {
+                    // On MacOS, we need to bind the socket to the loopback interface
+                    // to be able to send packets to the multicast group.
+                    InetAddress LOCALHOST_IPV6 = Inet6Address.getByName("::1");
+                    socket = new MulticastSocket(new InetSocketAddress(LOCALHOST_IPV6, 0));
+                    socket.setInterface(LOCALHOST_IPV6);
+                } else {
+                    socket = new MulticastSocket();
                 }
-
-                if (!success) {
-                    FusionIdeaPlugin.log.warn("Couldn't send ipv6 ssdp packet on any interface");
-                    return null;
-                }
-
+                socket.setLoopbackMode(false);
+                DatagramPacket packet = new DatagramPacket(
+                    SEARCH_MESSAGE, SEARCH_MESSAGE.length,
+                    new InetSocketAddress(
+                        Inet6Address.getByName(MULTICAST_GROUP_IPV6), MULTICAST_PORT));
+                socket.send(packet);
                 return socket;
             } catch (IOException ex) {
                 FusionIdeaPlugin.log.debug("ipv6 ssdp failed", ex);
