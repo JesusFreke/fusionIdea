@@ -256,11 +256,19 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
     }
 
     @Override public void updateLibrary() {
-        ApplicationManager.getApplication().runWriteAction(() -> {
-            ModifiableRootModel model = ModuleRootManager.getInstance(getModule()).getModifiableModel();
-            updateLibrary(model);
-            model.commit();
-        });
+        Runnable runnable = () -> {
+            ApplicationManager.getApplication().runWriteAction(() -> {
+                ModifiableRootModel model = ModuleRootManager.getInstance(getModule()).getModifiableModel();
+                updateLibrary(model);
+                model.commit();
+            });
+        };
+
+        if (!ApplicationManager.getApplication().isWriteThread()) {
+            ApplicationManager.getApplication().invokeLater(runnable);
+        } else {
+            runnable.run();
+        }
     }
 
     @Override public void removeLibrary() {
