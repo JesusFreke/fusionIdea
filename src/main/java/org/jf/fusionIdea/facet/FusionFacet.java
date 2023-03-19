@@ -40,8 +40,6 @@ import com.intellij.facet.ui.FacetEditorContext;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
-import com.intellij.openapi.progress.ProgressIndicator;
-import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.*;
 import com.intellij.openapi.roots.impl.libraries.LibraryEx;
@@ -282,14 +280,13 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
     }
 
     public static List<ProcessInfo> getProcesses(Project project) {
-        if (ApplicationManager.getApplication().isDispatchThread()) {
+        if (ApplicationManager.getApplication().isDispatchThread() ||
+                ApplicationManager.getApplication().isReadAccessAllowed()) {
             SettableFuture<List<ProcessInfo>> future = SettableFuture.create();
 
-            new Task.Backgroundable(project, "Retreiving processes") {
-                @Override public void run(@NotNull ProgressIndicator indicator) {
-                    future.set(LocalAttachHost.INSTANCE.getProcessList());
-                }
-            }.queue();
+
+            Thread t = new Thread(() -> future.set(LocalAttachHost.INSTANCE.getProcessList()));
+            t.start();
 
             try {
                 return future.get(5, TimeUnit.SECONDS);
