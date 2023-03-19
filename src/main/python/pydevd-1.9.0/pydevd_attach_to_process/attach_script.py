@@ -236,9 +236,10 @@ def attach(port, host, protocol=''):
             stdoutToServer=True,
             stderrToServer=True,
             overwrite_prev_trace=True,
-            suspend=False,
+            suspend=True,
             trace_only_current_thread=False,
             patch_multiprocessing=False,
+            stop_at_frame=False
         )
     except:
         import traceback
