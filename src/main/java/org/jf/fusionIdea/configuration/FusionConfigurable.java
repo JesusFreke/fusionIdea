@@ -128,7 +128,7 @@ public class FusionConfigurable implements SearchableConfigurable {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
                 FusionFacet facet = FusionFacet.getInstance(module);
                 if (facet == null) {
-                    facet = FusionFacet.addFacet(module, ModifiableModelsProvider.SERVICE.getInstance());
+                    facet = FusionFacet.addFacet(module, ModifiableModelsProvider.getInstance());
                 }
 
                 facet.getConfiguration().setFusionPath(fusionPathCombo.getText());
@@ -139,7 +139,7 @@ public class FusionConfigurable implements SearchableConfigurable {
             for (Module module : ModuleManager.getInstance(project).getModules()) {
                 FusionFacet facet = FusionFacet.getInstance(module);
                 if (facet != null) {
-                    facet.removeFacet(ModifiableModelsProvider.SERVICE.getInstance());
+                    facet.removeFacet(ModifiableModelsProvider.getInstance());
                 }
             }
         }
