@@ -87,6 +87,13 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.6"><b>v0.6.6</b></a> (2022-03-20) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.5...v0.6.6"><small>v0.6.6 Changelog</small></a> <br/>
+        <ul>
+            <li>Fix the networking code on macos. Thanks to Julien Phalip for investigating and fixing this!</li>
+            <li>Fix an issue where the debugger would pause execution at the wrong location, on the second and subsequence attaches. Thanks to Bonjour123 for investigating this and suggesting a fix!</li>
+            <li>Fixed a few thread access issues</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.5"><b>v0.6.5</b></a> (2022-02-09) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.4...v0.6.5"><small>v0.6.5 Changelog</small></a> <br/>
         <ul>
