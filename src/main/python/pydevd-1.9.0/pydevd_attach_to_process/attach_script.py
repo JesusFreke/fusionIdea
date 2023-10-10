@@ -189,58 +189,54 @@ def fix_main_thread_id(on_warn=lambda msg:None, on_exception=lambda msg:None, on
 
 
 def attach(port, host, protocol=''):
-    try:
-        import sys
-        fix_main_thread = 'threading' not in sys.modules
+    import sys
+    fix_main_thread = 'threading' not in sys.modules
 
-        if fix_main_thread:
+    if fix_main_thread:
 
-            def on_warn(msg):
-                from _pydev_bundle import pydev_log
-                pydev_log.warn(msg)
+        def on_warn(msg):
+            from _pydev_bundle import pydev_log
+            pydev_log.warn(msg)
 
-            def on_exception(msg):
-                from _pydev_bundle import pydev_log
-                pydev_log.exception(msg)
+        def on_exception(msg):
+            from _pydev_bundle import pydev_log
+            pydev_log.exception(msg)
 
-            def on_critical(msg):
-                from _pydev_bundle import pydev_log
-                pydev_log.critical(msg)
+        def on_critical(msg):
+            from _pydev_bundle import pydev_log
+            pydev_log.critical(msg)
 
-            fix_main_thread_id(on_warn=on_warn, on_exception=on_exception, on_critical=on_critical)
+        fix_main_thread_id(on_warn=on_warn, on_exception=on_exception, on_critical=on_critical)
 
-        else:
-            from _pydev_bundle import pydev_log  # @Reimport
-            pydev_log.debug('The threading module is already imported by user code.')
+    else:
+        from _pydev_bundle import pydev_log  # @Reimport
+        pydev_log.debug('The threading module is already imported by user code.')
 
-        if protocol:
-            from _pydevd_bundle import pydevd_defaults
-            pydevd_defaults.PydevdCustomization.DEFAULT_PROTOCOL = protocol
+    if protocol:
+        from _pydevd_bundle import pydevd_defaults
+        pydevd_defaults.PydevdCustomization.DEFAULT_PROTOCOL = protocol
 
-        import pydevd
+    import pydevd
 
-        # I.e.: disconnect/reset if already connected.
+    # I.e.: disconnect/reset if already connected.
 
-        pydevd.SetupHolder.setup = None
+    pydevd.SetupHolder.setup = None
 
-        py_db = pydevd.get_global_debugger()
-        if py_db is not None:
-            py_db.dispose_and_kill_all_pydevd_threads(wait=False)
+    py_db = pydevd.get_global_debugger()
+    if py_db is not None:
+        py_db.dispose_and_kill_all_pydevd_threads(wait=False)
 
-        # pydevd.DebugInfoHolder.DEBUG_RECORD_SOCKET_READS = True
-        # pydevd.DebugInfoHolder.DEBUG_TRACE_BREAKPOINTS = 3
-        # pydevd.DebugInfoHolder.DEBUG_TRACE_LEVEL = 3
-        pydevd.settrace(
-            port=port,
-            host=host,
-            stdoutToServer=True,
-            stderrToServer=True,
-            overwrite_prev_trace=True,
-            suspend=True,
-            trace_only_current_thread=False,
-            patch_multiprocessing=False,
-            stop_at_frame=False
-        )
-    except:
-        import traceback
-        traceback.print_exc()
+    # pydevd.DebugInfoHolder.DEBUG_RECORD_SOCKET_READS = True
+    # pydevd.DebugInfoHolder.DEBUG_TRACE_BREAKPOINTS = 3
+    # pydevd.DebugInfoHolder.DEBUG_TRACE_LEVEL = 3
+    pydevd.settrace(
+        port=port,
+        host=host,
+        stdoutToServer=True,
+        stderrToServer=True,
+        overwrite_prev_trace=True,
+        suspend=True,
+        trace_only_current_thread=False,
+        patch_multiprocessing=False,
+        stop_at_frame=False
+    )
