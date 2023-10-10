@@ -87,6 +87,11 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.7"><b>v0.6.7</b></a> (2022-03-20) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.6...v0.6.7"><small>v0.6.7 Changelog</small></a> <br/>
+        <ul>
+            <li>Fix a small issue in pydevd related to Fusion updating its bundled python to 3.11</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.6"><b>v0.6.6</b></a> (2022-03-20) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.5...v0.6.6"><small>v0.6.6 Changelog</small></a> <br/>
         <ul>
