@@ -163,7 +163,7 @@ class FilesFiltering(object):
 
         # Make sure we always get at least the standard library location (based on the `os` and
         # `threading` modules -- it's a bit weird that it may be different on the ci, but it happens).
-        roots.append(os.path.dirname(os.__file__))
+        # roots.append(os.path.dirname(os.__file__))
         roots.append(os.path.dirname(threading.__file__))
 
         if hasattr(site, 'getusersitepackages'):
