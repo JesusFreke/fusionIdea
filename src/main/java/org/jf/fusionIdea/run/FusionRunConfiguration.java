@@ -47,6 +47,7 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PythonSdkUtil;
+import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,7 +62,8 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         implements RunConfigurationWithSuppressedDefaultDebugAction, RunConfigurationWithSuppressedDefaultRunAction {
 
     private String script;
-    private String sdkHome;
+    @Nullable
+    private String sdkName;
     private boolean useModuleSdk;
 
     public FusionRunConfiguration(Project project, ConfigurationFactory factory) {
@@ -129,21 +131,22 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         this.script = script;
     }
 
-    public String getSdkHome() {
-        return sdkHome;
+    public void setSdkName(@Nullable String sdkName) {
+        this.sdkName = sdkName;
     }
 
-    public void setSdkHome(String sdkHome) {
-        this.sdkHome = sdkHome;
+    @Nullable
+    public String getSdkName() {
+        return sdkName;
     }
 
     @Nullable public Sdk getSdk() {
         if (useModuleSdk) {
             return PythonSdkUtil.findPythonSdk(getModule());
-        } else if (StringUtil.isEmpty(getSdkHome())) {
+        } else if (StringUtil.isEmpty(getSdkName())) {
             return ProjectRootManager.getInstance(getProject()).getProjectSdk();
         }
-        return PythonSdkUtil.findSdkByPath(getSdkHome());
+        return PythonSdkUtil.findSdkByKey(getSdkName());
     }
 
     public boolean useModuleSdk() {
@@ -186,14 +189,24 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
     @Override public void writeExternal(@NotNull Element element) throws WriteExternalException {
         super.writeExternal(element);
         JDOMExternalizerUtil.writeField(element, "script", script);
-        JDOMExternalizerUtil.writeField(element, "sdkHome", sdkHome);
+        JDOMExternalizerUtil.writeField(element, "sdkName", sdkName);
         JDOMExternalizerUtil.writeField(element, "useModuleSdk", Boolean.toString(useModuleSdk));
     }
 
     @Override public void readExternal(@NotNull Element element) throws InvalidDataException {
         super.readExternal(element);
         script = JDOMExternalizerUtil.readField(element, "script");
-        sdkHome = JDOMExternalizerUtil.readField(element, "sdkHome");
+        sdkName = JDOMExternalizerUtil.readField(element, "sdkName");
+        if (StringUtils.isEmpty(sdkName)) {
+            // sdkPath was replaced with sdkName, but this is to migrate old projects that still have sdkPath set
+            String sdkHome = JDOMExternalizerUtil.readField(element, "sdkHome");
+            if (!StringUtils.isEmpty(sdkHome)) {
+                Sdk sdk = PythonSdkUtil.findSdkByPath(sdkHome);
+                if (sdk != null) {
+                    sdkName = sdk.getName();
+                }
+            }
+        }
         useModuleSdk = Boolean.parseBoolean(JDOMExternalizerUtil.readField(element, "useModuleSdk"));
     }
 

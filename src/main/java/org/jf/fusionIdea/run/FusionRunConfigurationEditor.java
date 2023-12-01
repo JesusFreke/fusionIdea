@@ -41,7 +41,6 @@ import com.intellij.openapi.roots.ui.configuration.ModulesAlphaComparator;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.TextBrowseFolderListener;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionComboBoxModel;
@@ -57,7 +56,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfiguration> implements PanelWithAnchor {
@@ -68,7 +66,7 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
     private JRadioButton myUseModuleSdkRadioButton;
     private ModulesComboBox myModuleComboBox;
     private JRadioButton myUseSpecifiedSdkRadioButton;
-    private ComboBox myInterpreterComboBox;
+    private ComboBox<Sdk> myInterpreterComboBox;
 
     public FusionRunConfigurationEditor(FusionRunConfiguration configuration) {
         FileChooserDescriptor chooserDescriptor = FileChooserDescriptorExtKt.withPythonFiles(
@@ -88,8 +86,8 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
         scriptTextField.addBrowseFolderListener(listener);
 
         List<Module> validPythonModules = AbstractPythonRunConfiguration.getValidModules(configuration.getProject());
-        Collections.sort(validPythonModules, new ModulesAlphaComparator());
-        Module selection = validPythonModules.size() > 0 ? validPythonModules.get(0) : null;
+        validPythonModules.sort(new ModulesAlphaComparator());
+        Module selection = !validPythonModules.isEmpty() ? validPythonModules.get(0) : null;
 
         myModuleComboBox.setModules(validPythonModules);
         myModuleComboBox.setSelectedModule(selection);
@@ -107,12 +105,12 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
         myInterpreterComboBox.addActionListener(actionListener);
         myModuleComboBox.addActionListener(actionListener);
 
-        setSdkHome(null);
+        setSdkName(null);
     }
 
     protected void resetEditorFrom(@NotNull FusionRunConfiguration configuration) {
         setScript(configuration.getScript());
-        setSdkHome(configuration.getSdkHome());
+        setSdkName(configuration.getSdkName());
         setUseModuleSdk(configuration.useModuleSdk());
 
         if (configuration.useModuleSdk()) {
@@ -124,7 +122,8 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
 
     protected void applyEditorTo(@NotNull FusionRunConfiguration configuration) throws ConfigurationException {
         configuration.setScript(getScript());
-        configuration.setSdkHome(getSdkHome());
+        configuration.setSdkName(getSdkName());
+
         configuration.setUseModuleSdk(isUseModuleSdk());
 
         if (isUseModuleSdk()) {
@@ -162,24 +161,25 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
     }
 
     @Nullable
-    public String getSdkHome() {
+    public String getSdkName() {
         Sdk selectedSdk = (Sdk)myInterpreterComboBox.getSelectedItem();
-        return selectedSdk == null ? null : selectedSdk.getHomePath();
+        return selectedSdk == null ? null : selectedSdk.getName();
     }
 
-    public void setSdkHome(String sdkHome) {
+    public void setSdkName(@Nullable String sdkName) {
         List<Sdk> sdkList = new ArrayList<>();
         sdkList.add(null);
-        final List<Sdk> allSdks = PythonSdkUtil.getAllSdks();
-        Collections.sort(allSdks, new PreferredSdkComparator());
+        final List<Sdk> allSdks = new ArrayList<>(PythonSdkUtil.getAllSdks());
+        allSdks.sort(new PreferredSdkComparator());
         Sdk selection = null;
         for (Sdk sdk : allSdks) {
-            String homePath = sdk.getHomePath();
-            if (homePath != null && sdkHome != null && FileUtil.pathsEqual(homePath, sdkHome)) selection = sdk;
+            if (sdkName != null && sdk.getName().equals(sdkName)) {
+                selection = sdk;
+            }
             sdkList.add(sdk);
         }
 
-        myInterpreterComboBox.setModel(new CollectionComboBoxModel(sdkList, selection));
+        myInterpreterComboBox.setModel(new CollectionComboBoxModel<Sdk>(sdkList, selection));
     }
 
     public Module getModule() {
