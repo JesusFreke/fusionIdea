@@ -3,5 +3,10 @@
         <projectConfigurable groupId="language"  instance="org.jf.fusionIdea.configuration.FusionConfigurable"
                              id="org.jf.fusionIdea.configuration.FusionConfigurable" displayName="Fusion 360"
                              nonDefaultProject="true"/>
+
+        <localInspection language="Python" shortName="PycharmFusionExecutableInspection" suppressId="FusionExecutable"
+                         displayName="Invalid Fusion 360 path selected"
+                         enabledByDefault="true"  level="WARNING"
+                         implementationClass="org.jf.fusionIdea.inspection.PycharmFusionExecutableInspection"/>
     </extensions>
 </idea-plugin>

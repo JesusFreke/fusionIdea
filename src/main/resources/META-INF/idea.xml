@@ -1,0 +1,8 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <localInspection language="Python" shortName="FusionExecutableInspection" suppressId="FusionExecutable"
+                         displayName="Invalid Fusion 360 path selected"
+                         enabledByDefault="true"  level="WARNING"
+                         implementationClass="org.jf.fusionIdea.inspection.FusionExecutableInspection"/>
+    </extensions>
+</idea-plugin>

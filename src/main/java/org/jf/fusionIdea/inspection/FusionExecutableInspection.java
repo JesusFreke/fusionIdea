@@ -50,7 +50,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileManager;
 import com.intellij.psi.PsiElementVisitor;
-import com.intellij.util.PlatformUtils;
 import com.jetbrains.python.inspections.PyInspection;
 import com.jetbrains.python.inspections.PyInspectionVisitor;
 import com.jetbrains.python.psi.PyFile;
@@ -72,6 +71,16 @@ public class FusionExecutableInspection extends PyInspection {
         return "Invalid Fusion 360 path selected";
     }
 
+    protected List<LocalQuickFix> getQuickFixesForUpdatedFusionExecutable(@Nullable String newPath) {
+        List<LocalQuickFix> fixes = new ArrayList<>();
+        if (newPath != null) {
+            fixes.add(new UpdateFusionExecutableInAllModules(newPath));
+            fixes.add(new UpdateFusionExecutableInModule(newPath));
+        }
+        fixes.add(new OpenFacetConfiguration());
+        return fixes;
+    }
+
     @NotNull
     @Override
     public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder,
@@ -80,7 +89,7 @@ public class FusionExecutableInspection extends PyInspection {
         return new Visitor(holder, PyInspectionVisitor.getContext(session));
     }
 
-    public static class Visitor extends PyInspectionVisitor {
+    public class Visitor extends PyInspectionVisitor {
 
         public Visitor(@Nullable ProblemsHolder holder,
                        @NotNull TypeEvalContext context) {
@@ -100,16 +109,10 @@ public class FusionExecutableInspection extends PyInspection {
             }
 
             if (!FusionFacet.checkFusionPath(facet.getConfiguration().getFusionPath())) {
-                List<LocalQuickFix> fixes = new ArrayList<>();
+                List<LocalQuickFix> fixes;
                 String newPath = FusionFacet.autoDetectFusionPath();
 
-                if (newPath != null) {
-                    fixes.add(new UpdateFusionExecutableInAllModules(newPath));
-                    if (!PlatformUtils.isPyCharm()) {
-                        fixes.add(new UpdateFusionExecutableInModule(newPath));
-                    }
-                }
-                fixes.add(new OpenFacetConfiguration());
+                fixes = getQuickFixesForUpdatedFusionExecutable(newPath);
 
                 registerProblem(node, "The configured Fusion 360 executable is invalid.",
                         fixes.toArray(LocalQuickFix.EMPTY_ARRAY));
@@ -117,7 +120,7 @@ public class FusionExecutableInspection extends PyInspection {
         }
     }
 
-    public static final class UpdateFusionExecutableInAllModules implements LocalQuickFix {
+    public class UpdateFusionExecutableInAllModules implements LocalQuickFix {
         private final String newPath;
 
         public UpdateFusionExecutableInAllModules(String newPath) {
@@ -127,9 +130,6 @@ public class FusionExecutableInspection extends PyInspection {
         @NotNull
         @Override
         public String getFamilyName() {
-            if (PlatformUtils.isPyCharm()) {
-                return "Update Fusion 360 executable";
-            }
             return "Update Fusion 360 executable in all modules";
         }
 
@@ -163,7 +163,7 @@ public class FusionExecutableInspection extends PyInspection {
         }
     }
 
-    public static final class UpdateFusionExecutableInModule implements LocalQuickFix {
+    public final class UpdateFusionExecutableInModule implements LocalQuickFix {
         private final String newPath;
 
         public UpdateFusionExecutableInModule(String newPath) {
@@ -206,13 +206,10 @@ public class FusionExecutableInspection extends PyInspection {
         }
     }
 
-    public static final class OpenFacetConfiguration implements LocalQuickFix {
+    public class OpenFacetConfiguration implements LocalQuickFix {
         @NotNull
         @Override
         public String getFamilyName() {
-            if (PlatformUtils.isPyCharm()) {
-                return "Open Fusion 360 plugin configuration";
-            }
             return "Open Fusion 360 facet configuration";
         }
 
@@ -223,20 +220,16 @@ public class FusionExecutableInspection extends PyInspection {
 
         @Override
         public void applyFix(@NotNull final Project project, @NotNull ProblemDescriptor descriptor) {
-            if (PlatformUtils.isPyCharm()) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(project, "Fusion 360");
-            } else {
-                Module module = ModuleUtilCore.findModuleForPsiElement(descriptor.getPsiElement());
-                if (module == null) {
-                    return;
-                }
-                FusionFacet facet = FusionFacet.getInstance(module);
+            Module module = ModuleUtilCore.findModuleForPsiElement(descriptor.getPsiElement());
+            if (module == null) {
+                return;
+            }
+            FusionFacet facet = FusionFacet.getInstance(module);
 
-                if (facet != null) {
-                    ProjectStructureConfigurable configurable = ProjectStructureConfigurable.getInstance(project);
-                    ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
-                    configurable.select(facet, true);
-                }
+            if (facet != null) {
+                ProjectStructureConfigurable configurable = ProjectStructureConfigurable.getInstance(project);
+                ShowSettingsUtil.getInstance().editConfigurable(project, configurable);
+                configurable.select(facet, true);
             }
         }
     }

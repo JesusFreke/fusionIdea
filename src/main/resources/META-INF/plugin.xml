@@ -84,6 +84,7 @@ etc.</li>
 
     <depends>com.intellij.modules.python</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.pycharm</depends>
+    <depends optional="true" config-file="idea.xml">com.intellij.modules.idea</depends>
 
     <change-notes>
         <![CDATA[
@@ -155,11 +156,6 @@ etc.</li>
         <executor implementation="org.jf.fusionIdea.executor.FusionRunExecutor" />
         <executor implementation="org.jf.fusionIdea.executor.FusionDebugExecutor" />
         <executionTargetProvider implementation="org.jf.fusionIdea.run.FusionExecutionTargetProvider" />
-
-        <localInspection language="Python" shortName="FusionExecutableInspection" suppressId="FusionExecutable"
-                         displayName="Invalid Fusion 360 path selected"
-                         enabledByDefault="true"  level="WARNING"
-                         implementationClass="org.jf.fusionIdea.inspection.FusionExecutableInspection"/>
     </extensions>
 
     <extensions defaultExtensionNs="Pythonid">
