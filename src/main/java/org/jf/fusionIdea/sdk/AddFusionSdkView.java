@@ -67,6 +67,7 @@ public class AddFusionSdkView extends JPanel implements PyAddSdkView {
 
         List<Sdk> sdks = new ArrayList<>();
 
+        // TODO: deprecated usage, replace with suggestLocalHomePaths, once available per our minimum IDEA version
         for (String path : FusionPythonSdkFlavor.INSTANCE.suggestHomePaths(null, null)) {
             sdks.add(new PyDetectedSdk(path));
         }
@@ -117,6 +118,7 @@ public class AddFusionSdkView extends JPanel implements PyAddSdkView {
                     sdkHomeDir,
                     PythonSdkType.getInstance(),
                     false,
+                    // TODO: deprecated usage, replace with PythonSdkAdditionalData constructor that takes a PyFlavorAndData instance, once available per our minimum IDEA version
                     new PythonSdkAdditionalData(FusionPythonSdkFlavor.INSTANCE),
                     "Fusion 360 Python SDK");
         }

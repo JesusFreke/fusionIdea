@@ -264,6 +264,7 @@ public class FusionFacet extends LibraryContributingFacet<FusionFacetConfigurati
             });
         };
 
+        // TODO: deprecated usage, replace with isWriteIntentLockAcquired, once available per our minimum IDEA version
         if (!ApplicationManager.getApplication().isWriteThread()) {
             ApplicationManager.getApplication().invokeLater(runnable);
         } else {

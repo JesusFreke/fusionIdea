@@ -34,5 +34,6 @@ import com.intellij.ui.IconManager;
 import javax.swing.*;
 
 public class FusionIdeaIcons {
+    // TODO: deprecated usage, replace with getIcon("/logo.svg", FusionIdeaIcons.class, null), once available per our minimum IDEA version
     public static final Icon LOGO = IconManager.getInstance().getIcon("/logo.svg", FusionIdeaIcons.class);
 }

@@ -91,6 +91,7 @@ public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProv
         final List<XAttachDebugger> result = PythonSdkUtil.getAllLocalCPythons()
                 .stream()
                 .filter(sdk -> sdk != selectedSdk)
+                // TODO: deprecated usage, replace with PySdkExtKt.sdkSeemsValid(sdk), once available per our minimum IDEA version
                 .filter(sdk -> !PythonSdkUtil.isInvalid(sdk))
                 .sorted(PreferredSdkComparator.INSTANCE)
                 .map(PyLocalAttachDebugger::new)
