@@ -82,8 +82,8 @@ etc.</li>
 
     <idea-version since-build="222.3345.118"/>
 
-    <depends optional="true" config-file="intellij.xml">com.intellij.modules.java</depends>
-    <depends optional="true" config-file="pycharm.xml">com.intellij.modules.python</depends>
+    <depends>com.intellij.modules.python</depends>
+    <depends optional="true" config-file="pycharm.xml">com.intellij.modules.pycharm</depends>
 
     <change-notes>
         <![CDATA[
