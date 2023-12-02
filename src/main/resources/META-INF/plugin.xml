@@ -85,6 +85,7 @@ etc.</li>
     <depends>com.intellij.modules.python</depends>
     <depends optional="true" config-file="pycharm.xml">com.intellij.modules.pycharm</depends>
     <depends optional="true" config-file="idea.xml">com.intellij.modules.idea</depends>
+    <depends optional="true" config-file="java.xml">com.intellij.modules.java</depends>
 
     <change-notes>
         <![CDATA[
@@ -158,7 +159,6 @@ etc.</li>
         <programRunner implementation="org.jf.fusionIdea.run.FusionRunner" order="first"/>
         <runConfigurationProducer implementation="org.jf.fusionIdea.run.FusionRunConfigurationProducer"/>
         <facetType implementation="org.jf.fusionIdea.facet.FusionFacetType"/>
-        <framework.type implementation="org.jf.fusionIdea.framework.FusionFramework"/>
         <executor implementation="org.jf.fusionIdea.executor.FusionRunExecutor" />
         <executor implementation="org.jf.fusionIdea.executor.FusionDebugExecutor" />
         <executionTargetProvider implementation="org.jf.fusionIdea.run.FusionExecutionTargetProvider" />

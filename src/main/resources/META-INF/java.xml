@@ -1,0 +1,5 @@
+<idea-plugin>
+    <extensions defaultExtensionNs="com.intellij">
+        <framework.type implementation="org.jf.fusionIdea.framework.FusionFramework"/>
+    </extensions>
+</idea-plugin>
