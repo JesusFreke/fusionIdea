@@ -89,6 +89,11 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.9"><b>v0.6.9</b></a> (2023-12-01) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.8...v0.6.9"><small>v0.6.9 Changelog</small></a> <br/>
+        <ul>
+            <li>Minor tweaks to plugin dependencies to resolve a compatibility issue reported by the plugin verifier</li>
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.8"><b>v0.6.8</b></a> (2023-12-01) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.7...v0.6.8"><small>v0.6.8 Changelog</small></a> <br/>
         <ul>
