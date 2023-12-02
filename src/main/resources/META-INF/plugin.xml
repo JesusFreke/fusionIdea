@@ -88,7 +88,13 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
-        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.7"><b>v0.6.7</b></a> (2022-03-20) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.8"><b>v0.6.8</b></a> (2023-12-01) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.7...v0.6.8"><small>v0.6.8 Changelog</small></a> <br/>
+        <ul>
+            <li>Fix the python dependency configuration so IDEA will ensure python support is enabled when this plugin is enabled</li>
+            <li>Remove/refactor some deprecated/internal API usages</li>
+        </ul>
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.7"><b>v0.6.7</b></a> (2023-10-09) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.6...v0.6.7"><small>v0.6.7 Changelog</small></a> <br/>
         <ul>
             <li>Fix a small issue in pydevd related to Fusion updating its bundled python to 3.11</li>
