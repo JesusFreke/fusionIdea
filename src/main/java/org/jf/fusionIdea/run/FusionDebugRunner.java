@@ -109,7 +109,7 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
                                             }
                                         };
 
-                                PyDebugRunner.createConsoleCommunicationAndSetupActions(
+                                PyDebugRunner.createConsoleCommunication(
                                         environment.getProject(), result, pyDebugProcess, session);
                                 return pyDebugProcess;
                             }

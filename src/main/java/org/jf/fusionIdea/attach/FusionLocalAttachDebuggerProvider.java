@@ -54,6 +54,7 @@ import com.jetbrains.python.debugger.PyRemoteDebugProcess;
 import com.jetbrains.python.debugger.attach.PyLocalAttachDebuggerProvider;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
+import com.jetbrains.python.sdk.PySdkExtKt;
 import com.jetbrains.python.sdk.PythonSdkType;
 import com.jetbrains.python.sdk.PythonSdkUtil;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,7 @@ public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProv
                 .stream()
                 .filter(sdk -> sdk != selectedSdk)
                 // TODO: deprecated usage, replace with PySdkExtKt.sdkSeemsValid(sdk), once available per our minimum IDEA version
-                .filter(sdk -> !PythonSdkUtil.isInvalid(sdk))
+                .filter(sdk -> !PySdkExtKt.getSdkSeemsValid(sdk))
                 .sorted(PreferredSdkComparator.INSTANCE)
                 .map(PyLocalAttachDebugger::new)
                 .collect(Collectors.toList());
@@ -201,7 +202,7 @@ public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProv
                                         };
                                 pyDebugProcess.setPositionConverter(new PyLocalPositionConverter());
 
-                                PyDebugRunner.createConsoleCommunicationAndSetupActions(project, result, pyDebugProcess, session);
+                                PyDebugRunner.createConsoleCommunication(project, result, pyDebugProcess, session);
 
                                 return pyDebugProcess;
                             }
