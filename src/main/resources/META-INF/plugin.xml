@@ -168,10 +168,4 @@ etc.</li>
         <executor implementation="org.jf.fusionIdea.executor.FusionDebugExecutor" />
         <executionTargetProvider implementation="org.jf.fusionIdea.run.FusionExecutionTargetProvider" />
     </extensions>
-
-    <extensions defaultExtensionNs="Pythonid">
-        <pyAddSdkProvider implementation="org.jf.fusionIdea.sdk.AddFusionSdkProvider" />
-        <pythonFlavorProvider implementation="org.jf.fusionIdea.sdk.FusionPythonSdkFlavor$Provider"/>
-    </extensions>
-
 </idea-plugin>
