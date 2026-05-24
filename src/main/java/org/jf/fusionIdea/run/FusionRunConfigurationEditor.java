@@ -45,7 +45,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.ui.CollectionComboBoxModel;
 import com.intellij.ui.PanelWithAnchor;
-import com.jetbrains.extensions.python.FileChooserDescriptorExtKt;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
 import com.jetbrains.python.sdk.PythonSdkUtil;
@@ -69,8 +68,10 @@ public class FusionRunConfigurationEditor extends SettingsEditor<FusionRunConfig
     private ComboBox<Sdk> myInterpreterComboBox;
 
     public FusionRunConfigurationEditor(FusionRunConfiguration configuration) {
-        FileChooserDescriptor chooserDescriptor = FileChooserDescriptorExtKt.withPythonFiles(
-                FileChooserDescriptorFactory.createSingleFileDescriptor().withTitle("Select Script"), true);
+        FileChooserDescriptor chooserDescriptor = FileChooserDescriptorFactory
+                .singleFile()
+                .withTitle("Select Script")
+                .withExtensionFilter("py");
 
         TextBrowseFolderListener listener =
                 new TextBrowseFolderListener(chooserDescriptor, configuration.getProject()) {
