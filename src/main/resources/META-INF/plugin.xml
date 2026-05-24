@@ -89,6 +89,11 @@ etc.</li>
 
     <change-notes>
         <![CDATA[
+        <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.10"><b>v0.6.10</b></a> (2026-05-24) <br/>
+        <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.9...v0.6.10"><small>v0.6.10 Changelog</small></a> <br/>
+        <ul>
+            <li>Fixes for IDEA 2026.1.2
+        </ul>
         <a href="https://github.com/JesusFreke/fusionIdea/tree/v0.6.9"><b>v0.6.9</b></a> (2023-12-01) <br/>
         <a href="https://github.com/JesusFreke/fusionIdea/compare/v0.6.8...v0.6.9"><small>v0.6.9 Changelog</small></a> <br/>
         <ul>
