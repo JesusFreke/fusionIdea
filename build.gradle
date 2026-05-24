@@ -6,7 +6,7 @@ plugins {
 group = 'org.jf'
 version = '0.6.10'
 
-def pythonCoreVersion = "222.3345.131"
+def pythonCoreVersion = "261.24374.151"
 
 repositories {
     mavenCentral()
