@@ -47,7 +47,6 @@ import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PythonSdkUtil;
-import org.apache.commons.lang.StringUtils;
 import org.jdom.Element;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -197,10 +196,10 @@ public class FusionRunConfiguration extends ModuleBasedConfiguration<RunConfigur
         super.readExternal(element);
         script = JDOMExternalizerUtil.readField(element, "script");
         sdkName = JDOMExternalizerUtil.readField(element, "sdkName");
-        if (StringUtils.isEmpty(sdkName)) {
+        if (StringUtil.isEmpty(sdkName)) {
             // sdkPath was replaced with sdkName, but this is to migrate old projects that still have sdkPath set
             String sdkHome = JDOMExternalizerUtil.readField(element, "sdkHome");
-            if (!StringUtils.isEmpty(sdkHome)) {
+            if (!StringUtil.isEmpty(sdkHome)) {
                 Sdk sdk = PythonSdkUtil.findSdkByPath(sdkHome);
                 if (sdk != null) {
                     sdkName = sdk.getName();

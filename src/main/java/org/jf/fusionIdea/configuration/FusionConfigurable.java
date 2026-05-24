@@ -30,7 +30,7 @@
 package org.jf.fusionIdea.configuration;
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
-import com.intellij.openapi.fileChooser.FileTypeDescriptor;
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.options.ConfigurationException;
@@ -77,7 +77,10 @@ public class FusionConfigurable implements SearchableConfigurable {
         }
         enabledCheckbox.setSelected(fusionSupportEnabled);
 
-        FileChooserDescriptor chooserDescriptor = new FileTypeDescriptor("Choose Fusion 360 executable", ".exe");
+        FileChooserDescriptor chooserDescriptor = FileChooserDescriptorFactory
+                .singleFile()
+                .withTitle("Choose Fusion 360 Executable")
+                .withExtensionFilter(".exe");
 
         TextBrowseFolderListener listener =
                 new TextBrowseFolderListener(chooserDescriptor, project) {
