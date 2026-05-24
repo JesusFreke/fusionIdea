@@ -37,10 +37,7 @@ import com.intellij.execution.runners.AsyncProgramRunner;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.ui.RunContentDescriptor;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
-import com.intellij.xdebugger.XDebugProcess;
-import com.intellij.xdebugger.XDebugProcessStarter;
-import com.intellij.xdebugger.XDebugSession;
-import com.intellij.xdebugger.XDebuggerManager;
+import com.intellij.xdebugger.*;
 import com.jetbrains.python.debugger.PyDebugProcess;
 import com.jetbrains.python.debugger.PyDebugRunner;
 import com.jetbrains.python.debugger.PyRemoteDebugProcess;
@@ -63,10 +60,10 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
     @NotNull @Override
     protected Promise<RunContentDescriptor> execute(
             @NotNull ExecutionEnvironment environment, @NotNull RunProfileState state) throws ExecutionException {
-        return createSession(state, environment).then(XDebugSession::getRunContentDescriptor);
+        return createSession(state, environment).then(XSessionStartedResult::getRunContentDescriptor);
     }
 
-    protected Promise<XDebugSession> createSession(@NotNull RunProfileState state,
+    protected Promise<XSessionStartedResult> createSession(@NotNull RunProfileState state,
                                                    @NotNull final ExecutionEnvironment environment)
             throws ExecutionException {
         FileDocumentManager.getInstance().saveAllDocuments();
@@ -78,7 +75,7 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
         return fusionScriptState.execute(serverSocket.getLocalPort()).then(result -> {
             try {
                 return XDebuggerManager.getInstance(environment.getProject())
-                        .startSession(environment, new XDebugProcessStarter() {
+                        .newSessionBuilder(new XDebugProcessStarter() {
                             @Override
                             @NotNull
                             public XDebugProcess start(@NotNull final XDebugSession session) {
@@ -113,7 +110,10 @@ public class FusionDebugRunner extends AsyncProgramRunner<RunnerSettings> {
                                         environment.getProject(), result, pyDebugProcess, session);
                                 return pyDebugProcess;
                             }
-                        });
+                        })
+                        .showTab(true)
+                        .sessionName("fusionIdea Debugger")
+                        .startSession();
             } catch (ExecutionException ex) {
                 throw new RuntimeException(ex);
             }
