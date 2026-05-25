@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'org.jf'
-version = '0.6.10'
+version = '0.6.11'
 
 def pythonCoreVersion = "261.24374.151"
 
@@ -33,7 +33,7 @@ intellijPlatform {
     pluginConfiguration {
         id = "org.jf.fusionIdea"
         name = "Fusion 360 Scripting"
-        version = "0.6.10"
+        version = "0.6.11"
 
         ideaVersion {
             sinceBuild = "261"
