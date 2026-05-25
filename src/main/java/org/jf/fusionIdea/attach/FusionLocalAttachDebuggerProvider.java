@@ -34,6 +34,8 @@ import com.intellij.execution.RunManager;
 import com.intellij.execution.RunnerAndConfigurationSettings;
 import com.intellij.execution.configurations.RunConfiguration;
 import com.intellij.execution.process.ProcessInfo;
+import com.intellij.execution.target.TargetBasedSdkAdditionalData;
+import com.intellij.execution.target.TargetEnvironmentConfiguration;
 import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
@@ -54,9 +56,11 @@ import com.jetbrains.python.debugger.PyRemoteDebugProcess;
 import com.jetbrains.python.debugger.attach.PyLocalAttachDebuggerProvider;
 import com.jetbrains.python.run.AbstractPythonRunConfiguration;
 import com.jetbrains.python.sdk.PreferredSdkComparator;
-import com.jetbrains.python.sdk.PySdkExtKt;
+import com.jetbrains.python.sdk.PyInvalidSdk;
+import com.jetbrains.python.sdk.PySdkCoreToolsKt;
+import com.jetbrains.python.sdk.PythonSdkAdditionalData;
 import com.jetbrains.python.sdk.PythonSdkType;
-import com.jetbrains.python.sdk.PythonSdkUtil;
+import com.jetbrains.python.sdk.legacy.PythonSdkUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jf.fusionIdea.facet.FusionFacet;
 import org.jf.fusionIdea.run.FusionScriptState;
@@ -76,6 +80,22 @@ public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProv
 
     private static final int CONNECTION_TIMEOUT = 20000;
 
+    private static boolean sdkSeemsValid(Sdk sdk) {
+        if (!PythonSdkUtil.isPythonSdk(sdk, true)) {
+            return false;
+        }
+        if (sdk.getSdkAdditionalData() == PyInvalidSdk.INSTANCE) {
+            return false;
+        }
+
+        PythonSdkAdditionalData pythonSdkAdditionalData = PySdkCoreToolsKt.getOrCreateAdditionalData(sdk);
+        TargetEnvironmentConfiguration targetEnvironmentConfiguration = null;
+        if (pythonSdkAdditionalData instanceof TargetBasedSdkAdditionalData) {
+            targetEnvironmentConfiguration = ((TargetBasedSdkAdditionalData)pythonSdkAdditionalData).getTargetEnvironmentConfiguration();
+        }
+        return pythonSdkAdditionalData.getFlavorAndData().sdkSeemsValid(sdk, targetEnvironmentConfiguration);
+    }
+
     @NotNull
     private static List<XAttachDebugger> getAttachDebuggersForAllLocalSdks(@NotNull Project project) {
         Sdk selected = null;
@@ -92,8 +112,8 @@ public class FusionLocalAttachDebuggerProvider extends PyLocalAttachDebuggerProv
         final List<XAttachDebugger> result = PythonSdkUtil.getAllLocalCPythons()
                 .stream()
                 .filter(sdk -> sdk != selectedSdk)
-                // TODO: deprecated usage, replace with PySdkExtKt.sdkSeemsValid(sdk), once available per our minimum IDEA version
-                .filter(sdk -> !PySdkExtKt.getSdkSeemsValid(sdk))
+                // TODO: use SdkExtKt.isSdkSeemsValid, once available (compiling against 2026.6.2)
+                .filter(sdk -> !sdkSeemsValid(sdk))
                 .sorted(PreferredSdkComparator.INSTANCE)
                 .map(PyLocalAttachDebugger::new)
                 .collect(Collectors.toList());
